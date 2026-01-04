@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Data Swap — Interactive Demo</title>
-    <meta name="description" content="High-fidelity interactive demo of Data Swap MVP flow">
+    <meta name="description" content="Experience Data Swap's mobile-first P2P data exchange platform">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         * {
@@ -19,58 +19,58 @@
         }
 
         :root {
-            --dark: #0a0a0a;
+            --bg: #0a0a0a;
             --surface: #141414;
             --card: #1a1a1a;
-            --border: #2a2a2a;
-            --gray: #888888;
-            --light-gray: #b0b0b0;
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #fafafa;
+            --text-secondary: #888888;
             --accent: #0052cc;
             --accent-hover: #0066ff;
-            --success: #00a86b;
-            --off-white: #fafafa;
-            --demo-badge: #ff6b35;
+            --green: #00a86b;
+            --orange: #ff6b35;
         }
 
         body {
             font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--dark);
-            color: var(--off-white);
-            line-height: 1.6;
-            overflow-x: hidden;
+            background: var(--bg);
+            color: var(--text);
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
         }
 
-        /* Demo Mode Badge */
-        .demo-badge {
-            position: fixed;
-            top: 16px;
-            right: 16px;
-            z-index: 1000;
-            background: var(--demo-badge);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            box-shadow: 0 2px 12px rgba(255, 107, 53, 0.3);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.9; transform: scale(0.98); }
-        }
-
-        /* App Container */
-        .app {
+        #app {
             max-width: 480px;
             margin: 0 auto;
             min-height: 100vh;
-            background: var(--dark);
+            background: var(--bg);
             position: relative;
+        }
+
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Demo Badge */
+        .demo-badge {
+            position: fixed;
+            top: 12px;
+            right: 12px;
+            z-index: 1000;
+            background: var(--orange);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
         }
 
         /* Header */
@@ -79,59 +79,57 @@
             top: 0;
             z-index: 100;
             background: var(--surface);
+            backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
-            padding: 16px 20px;
+            padding: 14px 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            backdrop-filter: blur(10px);
         }
 
         .header-title {
-            font-family: 'Syne', sans-serif;
             font-size: 18px;
             font-weight: 700;
-            color: var(--off-white);
         }
 
-        .back-button {
+        .back-btn {
             background: none;
             border: none;
             color: var(--accent);
-            font-size: 24px;
+            font-size: 15px;
+            font-weight: 600;
             cursor: pointer;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 4px 0;
         }
 
-        /* Screen Container */
-        .screen {
-            display: none;
-            animation: fadeIn 0.3s ease;
+        /* Content */
+        .content {
+            padding: 0 0 80px 0;
         }
 
-        .screen.active {
-            display: block;
+        /* Feed */
+        .feed-header {
+            padding: 24px 20px 16px;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .feed-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
         }
 
-        /* Home Feed */
+        .feed-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
         .filter-tabs {
             display: flex;
             gap: 8px;
-            padding: 16px 20px;
+            padding: 0 20px 16px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
-        }
-
-        .filter-tabs::-webkit-scrollbar {
-            display: none;
         }
 
         .filter-tab {
@@ -141,20 +139,23 @@
             border-radius: 20px;
             font-size: 13px;
             font-weight: 500;
-            color: var(--gray);
-            white-space: nowrap;
+            color: var(--text-secondary);
             cursor: pointer;
-            transition: all 0.2s ease;
+            white-space: nowrap;
+            transition: all 0.2s;
         }
 
         .filter-tab.active {
             background: var(--accent);
-            color: white;
             border-color: var(--accent);
+            color: white;
         }
 
         .listings {
-            padding: 0 20px 100px;
+            padding: 0 20px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .listing-card {
@@ -162,197 +163,144 @@
             border: 1px solid var(--border);
             border-radius: 12px;
             padding: 16px;
-            margin-bottom: 12px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
         }
 
-        .listing-card:hover {
+        .listing-card:active {
+            transform: scale(0.98);
             border-color: var(--accent);
-            transform: translateY(-2px);
         }
 
         .listing-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
+            align-items: center;
+            margin-bottom: 16px;
         }
 
-        .listing-user {
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
             font-size: 14px;
             font-weight: 600;
-            color: var(--off-white);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
-        .listing-time {
+        .user-meta {
             font-size: 11px;
-            color: var(--gray);
+            color: var(--text-secondary);
         }
 
-        .network-badge {
+        .status-badge {
             padding: 4px 10px;
-            background: rgba(0, 82, 204, 0.1);
-            border: 1px solid rgba(0, 82, 204, 0.3);
+            background: rgba(0, 168, 107, 0.1);
+            border: 1px solid rgba(0, 168, 107, 0.2);
             border-radius: 12px;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 600;
-            color: var(--accent);
-        }
-
-        .listing-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .detail-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .detail-label {
-            font-size: 11px;
-            color: var(--gray);
+            color: var(--green);
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
-        .detail-value {
-            font-size: 15px;
+        .swap-display {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .swap-side {
+            text-align: center;
+        }
+
+        .swap-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .swap-amount {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .swap-network {
+            font-size: 12px;
+            color: var(--accent);
             font-weight: 600;
-            color: var(--off-white);
         }
 
         .swap-arrow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 8px 0;
-            color: var(--gray);
+            font-size: 20px;
+            color: var(--text-secondary);
         }
 
-        /* FAB */
-        .fab {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
+        .listing-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+            font-size: 12px;
+        }
+
+        .listing-time {
+            color: var(--text-secondary);
+        }
+
+        .listing-fee {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Detail */
+        .detail-container {
+            padding: 20px;
+        }
+
+        .detail-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .detail-avatar {
             width: 56px;
             height: 56px;
-            background: var(--accent);
             border-radius: 50%;
-            border: none;
-            color: white;
-            font-size: 28px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 16px rgba(0, 82, 204, 0.4);
-            transition: all 0.2s ease;
-        }
-
-        .fab:hover {
-            background: var(--accent-hover);
-            transform: scale(1.05);
-        }
-
-        /* Form */
-        .form-container {
-            padding: 24px 20px 100px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--off-white);
-            margin-bottom: 8px;
-        }
-
-        .form-input, .form-select {
-            width: 100%;
-            padding: 14px 16px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--off-white);
-            font-size: 15px;
-            font-family: inherit;
-            transition: all 0.2s ease;
-        }
-
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: var(--surface);
-        }
-
-        .radio-group {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .radio-option {
-            position: relative;
-        }
-
-        .radio-option input {
-            position: absolute;
-            opacity: 0;
-        }
-
-        .radio-label {
-            display: block;
-            padding: 12px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .radio-option input:checked + .radio-label {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
-
-        .btn {
-            width: 100%;
-            padding: 16px;
-            background: var(--accent);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .btn:hover {
-            background: var(--accent-hover);
-        }
-
-        .btn-secondary {
-            background: var(--card);
-            color: var(--off-white);
-            border: 1px solid var(--border);
-        }
-
-        /* Detail Page */
-        .detail-container {
-            padding: 24px 20px 100px;
+            font-weight: 700;
+            font-size: 22px;
         }
 
         .detail-card {
@@ -363,56 +311,138 @@
             margin-bottom: 20px;
         }
 
-        .detail-section {
+        .detail-swap {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 16px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .detail-swap .swap-amount {
+            font-size: 32px;
+        }
+
+        .detail-swap .swap-arrow {
+            font-size: 28px;
+        }
+
+        .info-section {
             margin-bottom: 24px;
         }
 
-        .detail-section:last-child {
-            margin-bottom: 0;
-        }
-
-        .detail-section-title {
+        .section-title {
             font-size: 12px;
             font-weight: 600;
-            color: var(--gray);
+            color: var(--text-secondary);
             text-transform: uppercase;
             letter-spacing: 0.05em;
             margin-bottom: 12px;
         }
 
-        .data-row {
+        .info-row {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             padding: 12px 0;
             border-bottom: 1px solid var(--border);
         }
 
-        .data-row:last-child {
+        .info-row:last-child {
             border-bottom: none;
         }
 
+        .info-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .how-it-works {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
         /* Trade Room */
-        .trade-header {
-            padding: 24px 20px;
+        .trade-container {
+            padding: 20px;
+        }
+
+        .progress-bar {
+            margin-bottom: 32px;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 16px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .step {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
             background: var(--surface);
-            border-bottom: 1px solid var(--border);
-        }
-
-        .trade-step {
+            border: 2px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 12px;
-            color: var(--gray);
-            margin-bottom: 8px;
-        }
-
-        .trade-title {
-            font-size: 20px;
             font-weight: 700;
-            color: var(--off-white);
+            color: var(--text-secondary);
+            transition: all 0.3s;
         }
 
-        .trade-content {
-            padding: 24px 20px 120px;
+        .step-circle.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            box-shadow: 0 0 0 4px rgba(0, 82, 204, 0.2);
+        }
+
+        .step-circle.completed {
+            background: var(--green);
+            border-color: var(--green);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            text-align: center;
+            line-height: 1.2;
         }
 
         .checklist {
@@ -424,706 +454,724 @@
         }
 
         .checklist-title {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
-            color: var(--off-white);
             margin-bottom: 16px;
         }
 
-        .checklist-item {
+        .check-item {
             display: flex;
             align-items: flex-start;
             gap: 12px;
             padding: 12px 0;
             border-bottom: 1px solid var(--border);
+            cursor: pointer;
         }
 
-        .checklist-item:last-child {
+        .check-item:last-child {
             border-bottom: none;
         }
 
         .checkbox {
-            width: 20px;
-            height: 20px;
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            border-radius: 6px;
             border: 2px solid var(--border);
-            border-radius: 4px;
-            flex-shrink: 0;
-            margin-top: 2px;
-            transition: all 0.2s ease;
-            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
         }
 
         .checkbox.checked {
-            background: var(--success);
-            border-color: var(--success);
-            position: relative;
+            background: var(--green);
+            border-color: var(--green);
         }
 
-        .checkbox.checked::after {
-            content: '✓';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .checklist-text {
+        .check-text {
+            flex: 1;
             font-size: 14px;
-            color: var(--light-gray);
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
-        .info-box {
-            background: rgba(0, 82, 204, 0.1);
-            border: 1px solid rgba(0, 82, 204, 0.3);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 20px;
-        }
-
-        .info-box-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--accent);
-            margin-bottom: 8px;
-        }
-
-        .info-box-text {
-            font-size: 13px;
-            color: var(--light-gray);
-            line-height: 1.6;
-        }
-
-        /* Payment Screen */
-        .payment-container {
-            padding: 24px 20px 120px;
-        }
-
-        .amount-display {
+        .payment-display {
             text-align: center;
-            padding: 40px 20px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            margin-bottom: 24px;
+            padding: 24px;
         }
 
-        .amount-label {
+        .payment-label {
             font-size: 13px;
-            color: var(--gray);
-            margin-bottom: 8px;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
         }
 
-        .amount-value {
-            font-size: 48px;
+        .payment-amount {
+            font-size: 36px;
             font-weight: 700;
             color: var(--accent);
-            font-family: 'Syne', sans-serif;
+            margin-bottom: 8px;
         }
 
-        .payment-disclaimer {
-            background: rgba(255, 107, 53, 0.1);
-            border: 1px solid rgba(255, 107, 53, 0.3);
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 24px;
-            text-align: center;
+        .payment-note {
+            font-size: 12px;
+            color: var(--text-secondary);
         }
 
-        .payment-disclaimer-text {
-            font-size: 13px;
-            color: var(--demo-badge);
-            font-weight: 600;
-        }
-
-        /* Confirmation */
-        .confirmation-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        .success-screen {
             padding: 60px 20px;
             text-align: center;
         }
 
         .success-icon {
-            width: 80px;
-            height: 80px;
-            background: var(--success);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            color: white;
+            font-size: 72px;
             margin-bottom: 24px;
-            animation: scaleIn 0.5s ease;
+            animation: bounce 0.6s ease;
         }
 
-        @keyframes scaleIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
         }
 
-        .confirmation-title {
+        .success-title {
             font-size: 24px;
             font-weight: 700;
-            color: var(--off-white);
             margin-bottom: 12px;
         }
 
-        .confirmation-text {
-            font-size: 15px;
-            color: var(--gray);
-            line-height: 1.6;
+        .success-text {
+            font-size: 14px;
+            color: var(--text-secondary);
             margin-bottom: 32px;
         }
 
-        /* Fixed Bottom Actions */
-        .bottom-actions {
+        /* Action Button */
+        .action-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .action-btn.secondary {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
+            margin-top: 12px;
+        }
+
+        /* Post Form */
+        .form-container {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 14px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 15px;
+            font-family: inherit;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .fee-preview {
+            background: rgba(0, 82, 204, 0.1);
+            border: 1px solid rgba(0, 82, 204, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .fee-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .fee-amount {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        /* Bottom Nav */
+        .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: var(--surface);
-            border-top: 1px solid var(--border);
-            padding: 16px 20px;
             max-width: 480px;
             margin: 0 auto;
+            background: var(--surface);
+            border-top: 1px solid var(--border);
+            display: flex;
+            padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+            z-index: 100;
         }
 
-        /* Utility */
-        .mt-20 { margin-top: 20px; }
-        .mb-20 { margin-bottom: 20px; }
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 11px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+        }
+
+        .nav-icon {
+            font-size: 22px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .empty-icon {
+            font-size: 56px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .filter-tabs::-webkit-scrollbar {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="demo-badge">Demo Mode — Payments Disabled</div>
-
-    <div class="app">
-        <!-- HOME FEED SCREEN -->
-        <div id="home" class="screen active">
+    <div class="demo-badge">DEMO MODE</div>
+    
+    <div id="app">
+        <!-- Feed Screen -->
+        <div id="feedScreen" class="screen active">
             <div class="header">
-                <h1 class="header-title">Data Swap</h1>
+                <div class="header-title">Data Swap</div>
+            </div>
+            
+            <div class="content">
+                <div class="feed-header">
+                    <h1 class="feed-title">Available Swaps</h1>
+                    <p class="feed-subtitle" id="listingCount">Loading...</p>
+                </div>
+                
+                <div class="filter-tabs">
+                    <button class="filter-tab active" onclick="filterListings('all')">All Networks</button>
+                    <button class="filter-tab" onclick="filterListings('MTN')">MTN</button>
+                    <button class="filter-tab" onclick="filterListings('Airtel')">Airtel</button>
+                    <button class="filter-tab" onclick="filterListings('Glo')">Glo</button>
+                </div>
+                
+                <div class="listings" id="listingsContainer"></div>
             </div>
 
-            <div class="filter-tabs" id="networkTabs">
-                <div class="filter-tab active" data-network="All" onclick="setNetworkFilter('All')">All Networks</div>
-                <div class="filter-tab" data-network="MTN" onclick="setNetworkFilter('MTN')">MTN</div>
-                <div class="filter-tab" data-network="Airtel" onclick="setNetworkFilter('Airtel')">Airtel</div>
-                <div class="filter-tab" data-network="Glo" onclick="setNetworkFilter('Glo')">Glo</div>
-                <div class="filter-tab" data-network="9mobile" onclick="setNetworkFilter('9mobile')">9mobile</div>
-            </div>
-
-            <div class="listings" id="listings">
-                <!-- Listings rendered by JS -->
-            </div>
-
-            <button class="fab"</div>
-
-        <!-- POST LISTING SCREEN -->
-        <div id="post" class="screen">
-            <div class="header">
-                <button class="back-button" onclick="goToHome()">←</button>
-                <h1 class="header-title">Post Swap</h1>
-                <div style="width: 24px;"></div>
-            </div>
-
-            <div class="form-container">
-                <div class="form-group">
-                    <label class="form-label">Network</label>
-                    <select class="form-select">
-                        <option>MTN</option>
-                        <option>Airtel</option>
-                        <option>Glo</option>
-                        <option>9mobile</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">I Have</label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" name="have-type" id="have-night" checked>
-                            <label class="radio-label" for="have-night">Night Data</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" name="have-type" id="have-weekend">
-                            <label class="radio-label" for="have-weekend">Weekend Data</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Data Size (GB)</label>
-                    <input type="number" class="form-input" placeholder="e.g. 5" value="5">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">I Want</label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" name="want-type" id="want-day" checked>
-                            <label class="radio-label" for="want-day">Day Data</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" name="want-type" id="want-anytime">
-                            <label class="radio-label" for="want-anytime">Anytime Data</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Data Size (GB)</label>
-                    <input type="number" class="form-input" placeholder="e.g. 5" value="5">
-                </div>
-
-                <button class="btn" onclick="showPosted()">Post Listing</button>
+            <div class="bottom-nav">
+                <button class="nav-item active">
+                    <div class="nav-icon">🏠</div>
+                    <div>Feed</div>
+                </button>
+                <button class="nav-item" onclick="showScreen('post')">
+                    <div class="nav-icon">➕</div>
+                    <div>Post</div>
+                </button>
+                <button class="nav-item" onclick="showScreen('profile')">
+                    <div class="nav-icon">👤</div>
+                    <div>Profile</div>
+                </button>
             </div>
         </div>
 
-        <!-- DETAIL SCREEN -->
-        <div id="detail" class="screen">
+        <!-- Detail Screen -->
+        <div id="detailScreen" class="screen">
             <div class="header">
-                <button class="back-button" onclick="goToHome()">←</button>
-                <h1 class="header-title">Swap Details</h1>
-                <div style="width: 24px;"></div>
+                <button class="back-btn" onclick="showScreen('feed')">← Back</button>
+                <div class="header-title">Swap Details</div>
+                <div style="width: 50px;"></div>
             </div>
 
-            <div class="detail-container">
-                <div class="detail-card">
-                    <div class="detail-section">
-                        <div class="detail-section-title">Posted By</div>
-                        <div class="data-row">
-                            <span style="color: var(--off-white); font-weight: 600;"><span id="dUser">Chidi A.</span></span>
-                            <span class="network-badge"><span id="dNetwork">MTN</span></span>
+            <div class="content">
+                <div class="detail-container">
+                    <div class="detail-user">
+                        <div class="detail-avatar" id="detailAvatar">CA</div>
+                        <div class="user-details">
+                            <div class="user-name" style="font-size: 18px; margin-bottom: 4px;" id="detailName">Chioma A.</div>
+                            <div class="user-meta" style="font-size: 13px;" id="detailMeta">⭐ 4.8 · 12 swaps</div>
                         </div>
                     </div>
 
-                    <div class="detail-section">
-                        <div class="detail-section-title">Swap Details</div>
-                        <div class="data-row">
-                            <span style="color: var(--gray);">They have</span>
-                            <span style="color: var(--off-white); font-weight: 600;"><span id="dHave">5GB Night Data</span></span>
-                        </div>
-                        <div class="data-row">
-                            <span style="color: var(--gray);">They want</span>
-                            <span style="color: var(--off-white); font-weight: 600;"><span id="dWant">5GB Day Data</span></span>
+                    <div class="detail-card">
+                        <div class="detail-swap">
+                            <div class="swap-side">
+                                <div class="swap-label">They're Offering</div>
+                                <div class="swap-amount" id="detailOffering">5GB</div>
+                                <div class="swap-network" id="detailOfferingNet">MTN</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;" id="detailOfferingType">Night</div>
+                            </div>
+                            <div class="swap-arrow">⇄</div>
+                            <div class="swap-side">
+                                <div class="swap-label">They Want</div>
+                                <div class="swap-amount" id="detailSeeking">5GB</div>
+                                <div class="swap-network" id="detailSeekingNet">MTN</div>
+                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;" id="detailSeekingType">Day</div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="detail-section">
-                        <div class="detail-section-title">Platform Fee</div>
-                        <div class="data-row">
-                            <span style="color: var(--gray);">Swap value (estimated)</span>
-                            <span style="color: var(--off-white); font-weight: 600;" id="dValue">₦200</span>
+                    <div class="info-section">
+                        <div class="section-title">Details</div>
+                        <div class="info-row">
+                            <span class="info-label">Platform Fee</span>
+                            <span class="info-value" id="detailFee">₦50</span>
                         </div>
-                        <div class="data-row">
-                            <span style="color: var(--gray);">Service charge</span>
-                            <span style="color: var(--accent); font-weight: 700; font-size: 18px;"><span id="dFeeAmt">₦50</span></span>
+                        <div class="info-row">
+                            <span class="info-label">Network</span>
+                            <span class="info-value" id="detailNetwork">MTN</span>
                         </div>
-                        <div style="font-size: 12px; color: var(--gray); margin-top: 8px;">
-                            Charged only after both users confirm swap completion
+                        <div class="info-row">
+                            <span class="info-label">Posted</span>
+                            <span class="info-value" id="detailTime">2 min ago</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Status</span>
+                            <span class="info-value" style="color: var(--green);">Active</span>
                         </div>
                     </div>
+
+                    <div class="info-section">
+                        <div class="section-title">How It Works</div>
+                        <div class="how-it-works">
+                            1. Initiate swap<br>
+                            2. Both users confirm data sent via USSD<br>
+                            3. Pay platform fee after confirmation<br>
+                            4. Final confirmation from both parties<br>
+                            5. Swap complete!
+                        </div>
+                    </div>
+
+                    <button class="action-btn" onclick="startTrade()">Start Swap</button>
                 </div>
-
-                <div class="info-box">
-                    <div class="info-box-title">How this works</div>
-                    <div class="info-box-text">
-                        1. Request this swap<br>
-                        2. Both users transfer data via their network’s USSD or in-app transfer menu<br>
-                        3. Confirm completion in Trade Room (no custody)<br>
-                        4. Platform fee (15%) processed after both confirm
-                    </div>
-                </div>
-            </div>
-
-            <div class="bottom-actions">
-                <button class="btn" onclick="goToTrade()">Request Swap</button>
             </div>
         </div>
 
-        <!-- TRADE ROOM SCREEN -->
-        <div id="trade" class="screen">
-            <div class="trade-header">
-                <div class="trade-step">Step 2 of 3</div>
-                <h1 class="trade-title">Trade Room</h1>
+        <!-- Trade Screen -->
+        <div id="tradeScreen" class="screen">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('detail')">← Back</button>
+                <div class="header-title">Trade Room</div>
+                <div style="width: 50px;"></div>
             </div>
 
-            <div class="trade-content">
-                <div class="info-box">
-                    <div class="info-box-title">No Wallet. No Escrow.</div>
-                    <div class="info-box-text">
-                        You transfer data directly via your telecom's USSD. 
-                        Data Swap only facilitates confirmation.
-                    </div>
-                </div>
-
-                <div class="checklist">
-                    <div class="checklist-title">Your Actions</div>
-                    <div class="checklist-item">
-                        <div class="checkbox" onclick="toggleCheck(this)"></div>
-                        <div class="checklist-text">
-                            Transfer your data using your network’s transfer menu (USSD / in-app). Codes can vary — follow the in-app instruction mapping.
+            <div class="content">
+                <div class="trade-container">
+                    <div class="progress-bar">
+                        <div class="progress-steps">
+                            <div class="progress-line">
+                                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                            </div>
+                            <div class="step">
+                                <div class="step-circle active" id="step1">1</div>
+                                <div class="step-label">Confirm<br>Sent</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-circle" id="step2">2</div>
+                                <div class="step-label">Payment</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-circle" id="step3">3</div>
+                                <div class="step-label">Final<br>Check</div>
+                            </div>
+                            <div class="step">
+                                <div class="step-circle" id="step4">✓</div>
+                                <div class="step-label">Done</div>
+                            </div>
                         </div>
                     </div>
-                    <div class="checklist-item">
-                        <div class="checkbox" onclick="toggleCheck(this)"></div>
-                        <div class="checklist-text">
-                            Confirm you sent the data
+
+                    <div id="tradeStep1">
+                        <div class="checklist">
+                            <div class="checklist-title">Step 1: Send Your Data</div>
+                            <div class="check-item" onclick="toggleCheck('check1')">
+                                <div class="checkbox" id="check1"></div>
+                                <div class="check-text">Dial *131*2*1# to transfer data to their number</div>
+                            </div>
+                            <div class="check-item" onclick="toggleCheck('check2')">
+                                <div class="checkbox" id="check2"></div>
+                                <div class="check-text">Wait for SMS confirmation from network</div>
+                            </div>
+                            <div class="check-item" onclick="toggleCheck('check3')">
+                                <div class="checkbox" id="check3"></div>
+                                <div class="check-text">Screenshot confirmation (recommended)</div>
+                            </div>
+                        </div>
+                        <button class="action-btn" id="step1Btn" onclick="goToStep(2)" disabled>I've Sent Data →</button>
+                        <button class="action-btn secondary">Report Issue</button>
+                    </div>
+
+                    <div id="tradeStep2" style="display: none;">
+                        <div class="checklist">
+                            <div class="checklist-title">Step 2: Payment</div>
+                            <div class="payment-display">
+                                <div class="payment-label">Both users confirmed data sent</div>
+                                <div class="payment-amount" id="paymentAmount">₦50</div>
+                                <div class="payment-note">Platform service fee</div>
+                            </div>
+                        </div>
+                        <button class="action-btn" onclick="goToStep(3)">Pay with Paystack →</button>
+                        <div style="font-size: 11px; color: var(--text-secondary); text-align: center; margin-top: 12px;">
+                            Secure payment powered by Paystack
+                        </div>
+                    </div>
+
+                    <div id="tradeStep3" style="display: none;">
+                        <div class="checklist">
+                            <div class="checklist-title">Step 3: Final Confirmation</div>
+                            <div class="check-item" onclick="toggleCheck('check4')">
+                                <div class="checkbox" id="check4"></div>
+                                <div class="check-text" id="confirmText">I confirm I received the data</div>
+                            </div>
+                            <div class="check-item" onclick="toggleCheck('check5')">
+                                <div class="checkbox" id="check5"></div>
+                                <div class="check-text">Data type and amount are correct</div>
+                            </div>
+                        </div>
+                        <button class="action-btn" id="step3Btn" onclick="goToStep(4)" disabled>Complete Swap ✓</button>
+                    </div>
+
+                    <div id="tradeStep4" style="display: none;">
+                        <div class="success-screen">
+                            <div class="success-icon">🎉</div>
+                            <div class="success-title">Swap Complete!</div>
+                            <div class="success-text" id="successText">You successfully completed your swap</div>
+                            <button class="action-btn" onclick="showScreen('feed')">Back to Feed</button>
                         </div>
                     </div>
                 </div>
-
-                <div class="checklist">
-                    <div class="checklist-title">Waiting for Chidi</div>
-                    <div class="checklist-item">
-                        <div class="checkbox"></div>
-                        <div class="checklist-text">
-                            Chidi transfers 5GB Night data to you
-                        </div>
-                    </div>
-                    <div class="checklist-item">
-                        <div class="checkbox"></div>
-                        <div class="checklist-text">
-                            Chidi confirms they sent the data
-                        </div>
-                    </div>
-                </div>
-
-                <div style="font-size: 13px; color: var(--gray); text-align: center; margin-top: 24px;">
-                    Payment unlocks after both users mark “data sent”. (Demo: the other user confirms automatically after you complete your checklist.)
-                </div>
-            </div>
-
-            <div class="bottom-actions">
-                <button class="btn" id="payUnlockBtn" onclick="tryUnlockPayment()">I've Sent the Data</button>
-                <button class="btn btn-secondary mt-20" onclick="cancelSwap()">Cancel Swap</button>
             </div>
         </div>
 
-        <!-- PAYMENT SCREEN -->
-        <div id="payment" class="screen">
+        <!-- Post Screen -->
+        <div id="postScreen" class="screen">
             <div class="header">
-                <button class="back-button" onclick="goToTrade()">←</button>
-                <h1 class="header-title">Payment</h1>
-                <div style="width: 24px;"></div>
+                <button class="back-btn" onclick="showScreen('feed')">Cancel</button>
+                <div class="header-title">Post Swap</div>
+                <div style="width: 50px;"></div>
             </div>
 
-            <div class="payment-container">
-                <div class="payment-disclaimer">
-                    <div class="payment-disclaimer-text">
-                        ⚠️ Demo — Payment Simulated
+            <div class="content">
+                <div class="form-container">
+                    <div class="form-group">
+                        <label class="form-label">You're Offering</label>
+                        <div class="form-grid">
+                            <input class="form-input" type="number" placeholder="Amount (GB)" id="offeringAmount">
+                            <select class="form-select" id="offeringNetwork">
+                                <option>MTN</option>
+                                <option>Airtel</option>
+                                <option>Glo</option>
+                                <option>9mobile</option>
+                            </select>
+                        </div>
+                        <select class="form-select" style="margin-top: 12px;" id="offeringType">
+                            <option>Day Data</option>
+                            <option>Night Data</option>
+                            <option>Weekend Data</option>
+                            <option>Weekday Data</option>
+                        </select>
                     </div>
-                </div>
 
-                <div class="amount-display">
-                    <div class="amount-label">Platform Service Fee</div>
-                    <div class="amount-value" id="pFeeAmt">₦50</div>
-                </div>
-
-                <div class="detail-card">
-                    <div class="detail-section">
-                        <div class="detail-section-title">Fee Breakdown</div>
-                        <div class="data-row">
-                            <span style="color: var(--gray);">Swap value (estimated)</span>
-                            <span style="color: var(--off-white);" id="pValue">₦200</span>
+                    <div class="form-group">
+                        <label class="form-label">You Want</label>
+                        <div class="form-grid">
+                            <input class="form-input" type="number" placeholder="Amount (GB)" id="seekingAmount">
+                            <select class="form-select" id="seekingNetwork">
+                                <option>MTN</option>
+                                <option>Airtel</option>
+                                <option>Glo</option>
+                                <option>9mobile</option>
+                            </select>
                         </div>
-                        <div class="data-row">
-                            <span style="color: var(--gray);">Platform fee</span>
-                            <span style="color: var(--off-white);" id="pFeeLine">15% → ₦30</span>
-                        </div>
-                        <div class="data-row">
-                            <span style="color: var(--gray);">Gateway fee (note)</span>
-                            <span style="color: var(--off-white);" id="pGateway">~1–2% (processor)</span>
-                        </div>
-                        <div class="data-row">
-                            <span style="color: var(--gray); font-weight: 600;">Total</span>
-                            <span style="color: var(--accent); font-weight: 700;" id="pTotal">₦30</span>
-                        </div>
+                        <select class="form-select" style="margin-top: 12px;" id="seekingType">
+                            <option>Day Data</option>
+                            <option>Night Data</option>
+                            <option>Weekend Data</option>
+                            <option>Weekday Data</option>
+                        </select>
                     </div>
-                </div>
 
-                <div class="info-box">
-                    <div class="info-box-title">In Production</div>
-                    <div class="info-box-text">
-                        Payment processed via Paystack/Flutterwave. 
-                        One-off transaction, no stored balance.
+                    <div class="fee-preview">
+                        <div class="fee-label">Estimated Platform Fee</div>
+                        <div class="fee-amount">₦30</div>
                     </div>
-                </div>
-            </div>
 
-            <div class="bottom-actions">
-                <button class="btn" onclick="goToConfirmation()">Proceed to Payment (Demo)</button>
+                    <button class="action-btn" style="margin-top: 24px;" onclick="submitPost()">Post Listing</button>
+                </div>
             </div>
         </div>
 
-        <!-- CONFIRMATION SCREEN -->
-        <div id="confirmation" class="screen">
+        <!-- Profile Screen -->
+        <div id="profileScreen" class="screen">
             <div class="header">
-                <h1 class="header-title">Swap Complete</h1>
+                <div></div>
+                <div class="header-title">Profile</div>
+                <div></div>
             </div>
 
-            <div class="confirmation-container">
-                <div class="success-icon">✓</div>
-                <h2 class="confirmation-title">Swap Successful!</h2>
-                <p class="confirmation-text">
-                    You've successfully swapped <span id="cYouSent">5GB Day</span> with <span id="cWithUser">Chidi A.</span>. 
-                    Both transfers confirmed.
-                </p>
-
-                <div class="detail-card" style="width: 100%; text-align: left;">
-                    <div class="detail-section">
-                        <div class="detail-section-title">Summary</div>
-                        <div class="data-row">
-                            <span style="color: var(--gray);">You sent</span>
-                            <span style="color: var(--off-white);">5GB Day Data</span>
-                        </div>
-                        <div class="data-row">
-                            <span style="color: var(--gray);">You received</span>
-                            <span style="color: var(--off-white);">5GB Night Data</span>
-                        </div>
-                        <div class="data-row">
-                            <span style="color: var(--gray);">Platform fee</span>
-                            <span style="color: var(--off-white);"><span id="cFeeAmt">₦30</span></span>
-                        </div>
-                    </div>
+            <div class="content">
+                <div class="empty-state">
+                    <div class="empty-icon">👤</div>
+                    <div class="empty-title">Profile</div>
+                    <div class="empty-text">View your swap history, settings, and stats</div>
                 </div>
+            </div>
 
-                <button class="btn" onclick="goToHome()">Back to Home</button>
-                <button class="btn btn-secondary mt-20" onclick="shareInvite()">Invite a friend</button>
+            <div class="bottom-nav">
+                <button class="nav-item" onclick="showScreen('feed')">
+                    <div class="nav-icon">🏠</div>
+                    <div>Feed</div>
+                </button>
+                <button class="nav-item" onclick="showScreen('post')">
+                    <div class="nav-icon">➕</div>
+                    <div>Post</div>
+                </button>
+                <button class="nav-item active">
+                    <div class="nav-icon">👤</div>
+                    <div>Profile</div>
+                </button>
             </div>
         </div>
     </div>
 
-    
     <script>
-        // ---- Demo data + state ----
-        const FEE_RATE = 0.15; // 15%
-        let currentNetworkFilter = 'All';
-        let currentListingId = 1;
-
-        let tradeState = {
-            youSent: false,
-            youConfirmed: false,
-            otherSent: false,
-            otherConfirmed: false
-        };
-
-        const listingsData = [
-            { id: 1, user: 'Chidi A.', time: '5 mins ago',  network: 'MTN',    have: '5GB Night',   want: '5GB Day',     value: 200 },
-            { id: 2, user: 'Amara O.', time: '12 mins ago', network: 'Airtel', have: '2GB Weekend', want: '2GB Anytime', value: 150 },
-            { id: 3, user: 'Tunde K.', time: '24 mins ago', network: 'MTN',    have: '10GB Night',  want: '8GB Day',     value: 400 },
-            { id: 4, user: 'Nike B.',  time: '31 mins ago', network: 'Glo',    have: '3GB Night',   want: '3GB Day',     value: 180 }
+        const listings = [
+            { id: 1, avatar: 'CA', name: 'Chioma A.', rating: '4.8', swaps: '12', offering: '5GB', offeringNetwork: 'MTN', offeringType: 'Night', seeking: '5GB', seekingNetwork: 'MTN', seekingType: 'Day', fee: '50', time: '2 min ago' },
+            { id: 2, avatar: 'IM', name: 'Ibrahim M.', rating: '5.0', swaps: '24', offering: '2GB', offeringNetwork: 'Airtel', offeringType: 'Day', seeking: '2GB', seekingNetwork: 'Airtel', seekingType: 'Night', fee: '30', time: '15 min ago' },
+            { id: 3, avatar: 'FO', name: 'Funke O.', rating: '4.9', swaps: '8', offering: '10GB', offeringNetwork: 'Glo', offeringType: 'Weekend', seeking: '10GB', seekingNetwork: 'Glo', seekingType: 'Weekday', fee: '50', time: '1 hr ago' },
+            { id: 4, avatar: 'TB', name: 'Tunde B.', rating: '4.7', swaps: '15', offering: '3GB', offeringNetwork: 'MTN', offeringType: 'Night', seeking: '3GB', seekingNetwork: 'MTN', seekingType: 'Day', fee: '30', time: '3 hr ago' },
+            { id: 5, avatar: 'AN', name: 'Ada N.', rating: '4.9', swaps: '19', offering: '7GB', offeringNetwork: 'Airtel', offeringType: 'Weekday', seeking: '7GB', seekingNetwork: 'Airtel', seekingType: 'Weekend', fee: '50', time: '5 hr ago' }
         ];
 
-        function formatNaira(n){
-            try { return '₦' + Number(n).toLocaleString('en-NG'); } catch(e) { return '₦' + n; }
-        }
-        function calcFee(value){
-            return Math.max(0, Math.round(Number(value) * FEE_RATE)); // simple rounding for demo
-        }
+        let currentListing = null;
+        let currentStep = 1;
+        let checks = {};
+        let currentFilter = 'all';
 
-        // ---- Navigation ----
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
-            window.scrollTo(0, 0);
+            document.getElementById(screenId + 'Screen').classList.add('active');
+            
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            if (screenId === 'feed') {
+                document.querySelectorAll('.nav-item')[0].classList.add('active');
+            } else if (screenId === 'profile') {
+                document.querySelectorAll('.nav-item')[2].classList.add('active');
+            }
         }
 
-        function goToHome() { showScreen('home'); }
-        function goToPost() { showScreen('post'); }
-
-        function goToDetail(id) {
-            currentListingId = id;
-            const listing = listingsData.find(x => x.id === id) || listingsData[0];
-
-            // Fill detail screen
-            document.getElementById('dUser').textContent = listing.user;
-            document.getElementById('dNetwork').textContent = listing.network;
-            document.getElementById('dHave').textContent = listing.have + ' Data';
-            document.getElementById('dWant').textContent = listing.want + ' Data';
-
-            const fee = calcFee(listing.value);
-            document.getElementById('dValue').textContent = formatNaira(listing.value);
-            document.getElementById('dFeeAmt').textContent = formatNaira(fee);
-
-            resetTradeState();
-            showScreen('detail');
-        }
-
-        function goToTrade() { showScreen('trade'); }
-
-        function goToPayment() {
-            const listing = listingsData.find(x => x.id === currentListingId) || listingsData[0];
-            const fee = calcFee(listing.value);
-
-            document.getElementById('pFeeAmt').textContent = formatNaira(fee);
-            document.getElementById('pValue').textContent = formatNaira(listing.value);
-            document.getElementById('pFeeLine').textContent = '15% → ' + formatNaira(fee);
-            document.getElementById('pTotal').textContent = formatNaira(fee);
-
-            showScreen('payment');
-        }
-
-        function goToConfirmation() {
-            const listing = listingsData.find(x => x.id === currentListingId) || listingsData[0];
-            const fee = calcFee(listing.value);
-
-            document.getElementById('cWithUser').textContent = listing.user;
-            document.getElementById('cYouSent').textContent = listing.want; // you send what they want
-            document.getElementById('cFeeAmt').textContent = formatNaira(fee);
-
-            showScreen('confirmation');
-        }
-
-        // ---- Home render + filtering ----
-        function setNetworkFilter(network){
-            currentNetworkFilter = network;
-            document.querySelectorAll('.filter-tab').forEach(tab => {
-                tab.classList.toggle('active', tab.getAttribute('data-network') === network);
-            });
+        function filterListings(network) {
+            currentFilter = network;
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
             renderListings();
         }
 
-        function renderListings(){
-            const container = document.getElementById('listings');
-            const filtered = (currentNetworkFilter === 'All')
-                ? listingsData
-                : listingsData.filter(x => x.network === currentNetworkFilter);
-
-            if(!filtered.length){
-                container.innerHTML = '<div style="padding:20px;color:var(--gray);text-align:center;">No listings for this network yet.</div>';
-                return;
-            }
-
-            container.innerHTML = filtered.map(l => {
-                const fee = calcFee(l.value);
-                return `
-                <div class="listing-card" onclick="goToDetail(${l.id})">
+        function renderListings() {
+            const container = document.getElementById('listingsContainer');
+            const filtered = currentFilter === 'all' ? listings : listings.filter(l => l.offeringNetwork === currentFilter);
+            
+            document.getElementById('listingCount').textContent = `${filtered.length} active listing${filtered.length !== 1 ? 's' : ''}`;
+            
+            container.innerHTML = filtered.map(listing => `
+                <div class="listing-card" onclick="showDetail(${listing.id})">
                     <div class="listing-header">
-                        <div>
-                            <div class="listing-user">${l.user}</div>
-                            <div class="listing-time">${l.time}</div>
+                        <div class="user-info">
+                            <div class="user-avatar">${listing.avatar}</div>
+                            <div class="user-details">
+                                <div class="user-name">${listing.name}</div>
+                                <div class="user-meta">⭐ ${listing.rating} · ${listing.swaps} swaps</div>
+                            </div>
                         </div>
-                        <div class="network-badge">${l.network}</div>
+                        <div class="status-badge">Active</div>
                     </div>
-
-                    <div class="listing-details">
-                        <div class="detail-item">
-                            <div class="detail-label">I Have</div>
-                            <div class="detail-value">${l.have}</div>
+                    <div class="swap-display">
+                        <div class="swap-side">
+                            <div class="swap-label">Offering</div>
+                            <div class="swap-amount">${listing.offering}</div>
+                            <div class="swap-network">${listing.offeringNetwork} ${listing.offeringType}</div>
                         </div>
-                        <div class="detail-item">
-                            <div class="detail-label">I Want</div>
-                            <div class="detail-value">${l.want}</div>
-                        </div>
-                    </div>
-
-                    <div class="listing-details" style="margin-top:4px;">
-                        <div class="detail-item">
-                            <div class="detail-label">Swap Value</div>
-                            <div class="detail-value">${formatNaira(l.value)}</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">Platform Fee</div>
-                            <div class="detail-value" style="color:var(--accent);">${formatNaira(fee)} <span style="font-size:12px;color:var(--gray);font-weight:500;">(15%)</span></div>
+                        <div class="swap-arrow">⇄</div>
+                        <div class="swap-side">
+                            <div class="swap-label">Seeking</div>
+                            <div class="swap-amount">${listing.seeking}</div>
+                            <div class="swap-network">${listing.seekingNetwork} ${listing.seekingType}</div>
                         </div>
                     </div>
-                </div>`;
-            }).join('');
+                    <div class="listing-footer">
+                        <div class="listing-time">${listing.time}</div>
+                        <div class="listing-fee">Fee: ₦${listing.fee}</div>
+                    </div>
+                </div>
+            `).join('');
         }
 
-        // ---- Trade room logic: unlock payment based on checklist ----
-        function resetTradeState(){
-            tradeState = { youSent:false, youConfirmed:false, otherSent:false, otherConfirmed:false };
-            document.querySelectorAll('#trade .checkbox').forEach(cb => cb.classList.remove('checked'));
-            updateUnlockButton();
+        function showDetail(id) {
+            currentListing = listings.find(l => l.id === id);
+            if (!currentListing) return;
+            
+            document.getElementById('detailAvatar').textContent = currentListing.avatar;
+            document.getElementById('detailName').textContent = currentListing.name;
+            document.getElementById('detailMeta').textContent = `⭐ ${currentListing.rating} · ${currentListing.swaps} completed swaps`;
+            document.getElementById('detailOffering').textContent = currentListing.offering;
+            document.getElementById('detailOfferingNet').textContent = currentListing.offeringNetwork;
+            document.getElementById('detailOfferingType').textContent = currentListing.offeringType;
+            document.getElementById('detailSeeking').textContent = currentListing.seeking;
+            document.getElementById('detailSeekingNet').textContent = currentListing.seekingNetwork;
+            document.getElementById('detailSeekingType').textContent = currentListing.seekingType;
+            document.getElementById('detailFee').textContent = '₦' + currentListing.fee;
+            document.getElementById('detailNetwork').textContent = currentListing.offeringNetwork;
+            document.getElementById('detailTime').textContent = currentListing.time;
+            
+            showScreen('detail');
         }
 
-        function toggleCheck(element) {
-            element.classList.toggle('checked');
+        function startTrade() {
+            currentStep = 1;
+            checks = {};
+            showScreen('trade');
+            updateTradeView();
+            
+            // Update payment amount
+            document.getElementById('paymentAmount').textContent = '₦' + currentListing.fee;
+            document.getElementById('confirmText').textContent = `I confirm I received ${currentListing.seeking} ${currentListing.seekingNetwork} ${currentListing.seekingType} data`;
+            document.getElementById('successText').textContent = `You successfully swapped ${currentListing.offering} for ${currentListing.seeking}`;
+        }
 
-            const parent = element.closest('.checklist');
-            if(!parent) return;
-
-            const title = parent.querySelector('.checklist-title')?.textContent || '';
-
-            if(title.includes('Your Actions')){
-                const boxes = Array.from(parent.querySelectorAll('.checklist-item .checkbox'));
-                const idx = boxes.indexOf(element);
-                if(idx === 0) tradeState.youSent = element.classList.contains('checked');
-                if(idx === 1) tradeState.youConfirmed = element.classList.contains('checked');
+        function toggleCheck(id) {
+            const el = document.getElementById(id);
+            if (checks[id]) {
+                delete checks[id];
+                el.classList.remove('checked');
+                el.textContent = '';
+            } else {
+                checks[id] = true;
+                el.classList.add('checked');
+                el.textContent = '✓';
             }
+            updateButtons();
+        }
 
-            updateUnlockButton();
-
-            if(tradeState.youSent && tradeState.youConfirmed && !(tradeState.otherSent && tradeState.otherConfirmed)){
-                setTimeout(simulateOtherUserConfirmed, 900);
+        function updateButtons() {
+            if (currentStep === 1) {
+                const btn = document.getElementById('step1Btn');
+                btn.disabled = !(checks.check1 && checks.check2);
+            } else if (currentStep === 3) {
+                const btn = document.getElementById('step3Btn');
+                btn.disabled = !(checks.check4 && checks.check5);
             }
         }
 
-        function simulateOtherUserConfirmed(){
-            const checklists = document.querySelectorAll('#trade .checklist');
-            const waiting = Array.from(checklists).find(c => (c.querySelector('.checklist-title')?.textContent || '').includes('Waiting for'));
-            if(!waiting) return;
-
-            const boxes = waiting.querySelectorAll('.checklist-item .checkbox');
-            boxes.forEach(b => b.classList.add('checked'));
-
-            tradeState.otherSent = true;
-            tradeState.otherConfirmed = true;
-            updateUnlockButton();
+        function goToStep(step) {
+            currentStep = step;
+            updateTradeView();
         }
 
-        function updateUnlockButton(){
-            const btn = document.getElementById('payUnlockBtn');
-            if(!btn) return;
-
-            const ready = tradeState.youSent && tradeState.youConfirmed && tradeState.otherSent && tradeState.otherConfirmed;
-            btn.textContent = ready ? 'Continue to Fee Payment' : "I've Sent the Data";
-            btn.style.opacity = ready ? '1' : '0.88';
-        }
-
-        function tryUnlockPayment(){
-            const ready = tradeState.youSent && tradeState.youConfirmed && tradeState.otherSent && tradeState.otherConfirmed;
-            if(!ready){
-                alert('Complete the checklist first. (Demo: the other user confirms after you finish your two steps.)');
-                return;
+        function updateTradeView() {
+            // Hide all steps
+            for (let i = 1; i <= 4; i++) {
+                const el = document.getElementById(`tradeStep${i}`);
+                if (el) el.style.display = i === currentStep ? 'block' : 'none';
             }
-            goToPayment();
+            
+            // Update progress
+            const progress = (currentStep - 1) * 33.33;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Update circles
+            for (let i = 1; i <= 4; i++) {
+                const circle = document.getElementById(`step${i}`);
+                circle.classList.remove('active', 'completed');
+                if (i < currentStep) {
+                    circle.classList.add('completed');
+                } else if (i === currentStep) {
+                    circle.classList.add('active');
+                }
+            }
         }
 
-        function cancelSwap(){
-            const ok = confirm('Cancel this swap? (Demo: this will reset the trade and return home.)');
-            if(!ok) return;
-            resetTradeState();
-            goToHome();
-        }
-
-        function showPosted() {
+        function submitPost() {
             alert('Listing posted! (Demo - not saved)');
-            goToHome();
+            showScreen('feed');
         }
 
-        function shareInvite(){
-            if(navigator.share){
-                navigator.share({ title: 'Data Swap', text: 'Check out the Data Swap demo', url: window.location.href }).catch(()=>{});
-            }else{
-                prompt('Copy and share this link:', window.location.href);
-            }
-        }
-
-        // Prevent actual form submissions
-        document.addEventListener('submit', (e) => e.preventDefault());
-
-        // Initial render
+        // Init
         renderListings();
     </script>
-
 </body>
 </html>
