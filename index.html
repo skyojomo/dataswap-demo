@@ -610,98 +610,19 @@
                 <h1 class="header-title">Data Swap</h1>
             </div>
 
-            <div class="filter-tabs">
-                <div class="filter-tab active">All Networks</div>
-                <div class="filter-tab">MTN</div>
-                <div class="filter-tab">Airtel</div>
-                <div class="filter-tab">Glo</div>
-                <div class="filter-tab">9mobile</div>
+            <div class="filter-tabs" id="networkTabs">
+                <div class="filter-tab active" data-network="All" onclick="setNetworkFilter('All')">All Networks</div>
+                <div class="filter-tab" data-network="MTN" onclick="setNetworkFilter('MTN')">MTN</div>
+                <div class="filter-tab" data-network="Airtel" onclick="setNetworkFilter('Airtel')">Airtel</div>
+                <div class="filter-tab" data-network="Glo" onclick="setNetworkFilter('Glo')">Glo</div>
+                <div class="filter-tab" data-network="9mobile" onclick="setNetworkFilter('9mobile')">9mobile</div>
             </div>
 
-            <div class="listings">
-                <div class="listing-card" onclick="goToDetail(1)">
-                    <div class="listing-header">
-                        <div>
-                            <div class="listing-user">Chidi A.</div>
-                            <div class="listing-time">5 mins ago</div>
-                        </div>
-                        <div class="network-badge">MTN</div>
-                    </div>
-                    <div class="listing-details">
-                        <div class="detail-item">
-                            <div class="detail-label">I Have</div>
-                            <div class="detail-value">5GB Night</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">I Want</div>
-                            <div class="detail-value">5GB Day</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="listing-card" onclick="goToDetail(2)">
-                    <div class="listing-header">
-                        <div>
-                            <div class="listing-user">Amara O.</div>
-                            <div class="listing-time">12 mins ago</div>
-                        </div>
-                        <div class="network-badge">Airtel</div>
-                    </div>
-                    <div class="listing-details">
-                        <div class="detail-item">
-                            <div class="detail-label">I Have</div>
-                            <div class="detail-value">2GB Weekend</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">I Want</div>
-                            <div class="detail-value">2GB Anytime</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="listing-card" onclick="goToDetail(3)">
-                    <div class="listing-header">
-                        <div>
-                            <div class="listing-user">Tunde K.</div>
-                            <div class="listing-time">24 mins ago</div>
-                        </div>
-                        <div class="network-badge">MTN</div>
-                    </div>
-                    <div class="listing-details">
-                        <div class="detail-item">
-                            <div class="detail-label">I Have</div>
-                            <div class="detail-value">10GB Night</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">I Want</div>
-                            <div class="detail-value">8GB Day</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="listing-card" onclick="goToDetail(4)">
-                    <div class="listing-header">
-                        <div>
-                            <div class="listing-user">Nike B.</div>
-                            <div class="listing-time">31 mins ago</div>
-                        </div>
-                        <div class="network-badge">Glo</div>
-                    </div>
-                    <div class="listing-details">
-                        <div class="detail-item">
-                            <div class="detail-label">I Have</div>
-                            <div class="detail-value">3GB Night</div>
-                        </div>
-                        <div class="detail-item">
-                            <div class="detail-label">I Want</div>
-                            <div class="detail-value">3GB Day</div>
-                        </div>
-                    </div>
-                </div>
+            <div class="listings" id="listings">
+                <!-- Listings rendered by JS -->
             </div>
 
-            <button class="fab" onclick="goToPost()">+</button>
-        </div>
+            <button class="fab"</div>
 
         <!-- POST LISTING SCREEN -->
         <div id="post" class="screen">
@@ -777,8 +698,8 @@
                     <div class="detail-section">
                         <div class="detail-section-title">Posted By</div>
                         <div class="data-row">
-                            <span style="color: var(--off-white); font-weight: 600;">Chidi A.</span>
-                            <span class="network-badge">MTN</span>
+                            <span style="color: var(--off-white); font-weight: 600;"><span id="dUser">Chidi A.</span></span>
+                            <span class="network-badge"><span id="dNetwork">MTN</span></span>
                         </div>
                     </div>
 
@@ -786,19 +707,23 @@
                         <div class="detail-section-title">Swap Details</div>
                         <div class="data-row">
                             <span style="color: var(--gray);">They have</span>
-                            <span style="color: var(--off-white); font-weight: 600;">5GB Night Data</span>
+                            <span style="color: var(--off-white); font-weight: 600;"><span id="dHave">5GB Night Data</span></span>
                         </div>
                         <div class="data-row">
                             <span style="color: var(--gray);">They want</span>
-                            <span style="color: var(--off-white); font-weight: 600;">5GB Day Data</span>
+                            <span style="color: var(--off-white); font-weight: 600;"><span id="dWant">5GB Day Data</span></span>
                         </div>
                     </div>
 
                     <div class="detail-section">
                         <div class="detail-section-title">Platform Fee</div>
                         <div class="data-row">
+                            <span style="color: var(--gray);">Swap value (estimated)</span>
+                            <span style="color: var(--off-white); font-weight: 600;" id="dValue">₦200</span>
+                        </div>
+                        <div class="data-row">
                             <span style="color: var(--gray);">Service charge</span>
-                            <span style="color: var(--accent); font-weight: 700; font-size: 18px;">₦50</span>
+                            <span style="color: var(--accent); font-weight: 700; font-size: 18px;"><span id="dFeeAmt">₦50</span></span>
                         </div>
                         <div style="font-size: 12px; color: var(--gray); margin-top: 8px;">
                             Charged only after both users confirm swap completion
@@ -810,9 +735,9 @@
                     <div class="info-box-title">How this works</div>
                     <div class="info-box-text">
                         1. Request this swap<br>
-                        2. Both users transfer data via USSD<br>
-                        3. Confirm completion in Trade Room<br>
-                        4. Platform fee processed
+                        2. Both users transfer data via their network’s USSD or in-app transfer menu<br>
+                        3. Confirm completion in Trade Room (no custody)<br>
+                        4. Platform fee (15%) processed after both confirm
                     </div>
                 </div>
             </div>
@@ -843,7 +768,7 @@
                     <div class="checklist-item">
                         <div class="checkbox" onclick="toggleCheck(this)"></div>
                         <div class="checklist-text">
-                            Transfer 5GB Day data to Chidi via MTN USSD (*131#)
+                            Transfer your data using your network’s transfer menu (USSD / in-app). Codes can vary — follow the in-app instruction mapping.
                         </div>
                     </div>
                     <div class="checklist-item">
@@ -871,13 +796,13 @@
                 </div>
 
                 <div style="font-size: 13px; color: var(--gray); text-align: center; margin-top: 24px;">
-                    Payment unlocks after both users mark "data sent"
+                    Payment unlocks after both users mark “data sent”. (Demo: the other user confirms automatically after you complete your checklist.)
                 </div>
             </div>
 
             <div class="bottom-actions">
-                <button class="btn" onclick="goToPayment()">I've Sent the Data</button>
-                <button class="btn btn-secondary mt-20">Cancel Swap</button>
+                <button class="btn" id="payUnlockBtn" onclick="tryUnlockPayment()">I've Sent the Data</button>
+                <button class="btn btn-secondary mt-20" onclick="cancelSwap()">Cancel Swap</button>
             </div>
         </div>
 
@@ -898,23 +823,27 @@
 
                 <div class="amount-display">
                     <div class="amount-label">Platform Service Fee</div>
-                    <div class="amount-value">₦50</div>
+                    <div class="amount-value" id="pFeeAmt">₦50</div>
                 </div>
 
                 <div class="detail-card">
                     <div class="detail-section">
                         <div class="detail-section-title">Fee Breakdown</div>
                         <div class="data-row">
-                            <span style="color: var(--gray);">Data size</span>
-                            <span style="color: var(--off-white);">≥5GB</span>
+                            <span style="color: var(--gray);">Swap value (estimated)</span>
+                            <span style="color: var(--off-white);" id="pValue">₦200</span>
                         </div>
                         <div class="data-row">
                             <span style="color: var(--gray);">Platform fee</span>
-                            <span style="color: var(--off-white);">₦50</span>
+                            <span style="color: var(--off-white);" id="pFeeLine">15% → ₦30</span>
+                        </div>
+                        <div class="data-row">
+                            <span style="color: var(--gray);">Gateway fee (note)</span>
+                            <span style="color: var(--off-white);" id="pGateway">~1–2% (processor)</span>
                         </div>
                         <div class="data-row">
                             <span style="color: var(--gray); font-weight: 600;">Total</span>
-                            <span style="color: var(--accent); font-weight: 700;">₦50</span>
+                            <span style="color: var(--accent); font-weight: 700;" id="pTotal">₦30</span>
                         </div>
                     </div>
                 </div>
@@ -943,7 +872,7 @@
                 <div class="success-icon">✓</div>
                 <h2 class="confirmation-title">Swap Successful!</h2>
                 <p class="confirmation-text">
-                    You've successfully swapped 5GB Day data with Chidi A. 
+                    You've successfully swapped <span id="cYouSent">5GB Day</span> with <span id="cWithUser">Chidi A.</span>. 
                     Both transfers confirmed.
                 </p>
 
@@ -960,18 +889,46 @@
                         </div>
                         <div class="data-row">
                             <span style="color: var(--gray);">Platform fee</span>
-                            <span style="color: var(--off-white);">₦50</span>
+                            <span style="color: var(--off-white);"><span id="cFeeAmt">₦30</span></span>
                         </div>
                     </div>
                 </div>
 
                 <button class="btn" onclick="goToHome()">Back to Home</button>
+                <button class="btn btn-secondary mt-20" onclick="shareInvite()">Invite a friend</button>
             </div>
         </div>
     </div>
 
+    
     <script>
-        // Simple navigation
+        // ---- Demo data + state ----
+        const FEE_RATE = 0.15; // 15%
+        let currentNetworkFilter = 'All';
+        let currentListingId = 1;
+
+        let tradeState = {
+            youSent: false,
+            youConfirmed: false,
+            otherSent: false,
+            otherConfirmed: false
+        };
+
+        const listingsData = [
+            { id: 1, user: 'Chidi A.', time: '5 mins ago',  network: 'MTN',    have: '5GB Night',   want: '5GB Day',     value: 200 },
+            { id: 2, user: 'Amara O.', time: '12 mins ago', network: 'Airtel', have: '2GB Weekend', want: '2GB Anytime', value: 150 },
+            { id: 3, user: 'Tunde K.', time: '24 mins ago', network: 'MTN',    have: '10GB Night',  want: '8GB Day',     value: 400 },
+            { id: 4, user: 'Nike B.',  time: '31 mins ago', network: 'Glo',    have: '3GB Night',   want: '3GB Day',     value: 180 }
+        ];
+
+        function formatNaira(n){
+            try { return '₦' + Number(n).toLocaleString('en-NG'); } catch(e) { return '₦' + n; }
+        }
+        function calcFee(value){
+            return Math.max(0, Math.round(Number(value) * FEE_RATE)); // simple rounding for demo
+        }
+
+        // ---- Navigation ----
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
@@ -980,22 +937,193 @@
 
         function goToHome() { showScreen('home'); }
         function goToPost() { showScreen('post'); }
-        function goToDetail(id) { showScreen('detail'); }
+
+        function goToDetail(id) {
+            currentListingId = id;
+            const listing = listingsData.find(x => x.id === id) || listingsData[0];
+
+            // Fill detail screen
+            document.getElementById('dUser').textContent = listing.user;
+            document.getElementById('dNetwork').textContent = listing.network;
+            document.getElementById('dHave').textContent = listing.have + ' Data';
+            document.getElementById('dWant').textContent = listing.want + ' Data';
+
+            const fee = calcFee(listing.value);
+            document.getElementById('dValue').textContent = formatNaira(listing.value);
+            document.getElementById('dFeeAmt').textContent = formatNaira(fee);
+
+            resetTradeState();
+            showScreen('detail');
+        }
+
         function goToTrade() { showScreen('trade'); }
-        function goToPayment() { showScreen('payment'); }
-        function goToConfirmation() { showScreen('confirmation'); }
+
+        function goToPayment() {
+            const listing = listingsData.find(x => x.id === currentListingId) || listingsData[0];
+            const fee = calcFee(listing.value);
+
+            document.getElementById('pFeeAmt').textContent = formatNaira(fee);
+            document.getElementById('pValue').textContent = formatNaira(listing.value);
+            document.getElementById('pFeeLine').textContent = '15% → ' + formatNaira(fee);
+            document.getElementById('pTotal').textContent = formatNaira(fee);
+
+            showScreen('payment');
+        }
+
+        function goToConfirmation() {
+            const listing = listingsData.find(x => x.id === currentListingId) || listingsData[0];
+            const fee = calcFee(listing.value);
+
+            document.getElementById('cWithUser').textContent = listing.user;
+            document.getElementById('cYouSent').textContent = listing.want; // you send what they want
+            document.getElementById('cFeeAmt').textContent = formatNaira(fee);
+
+            showScreen('confirmation');
+        }
+
+        // ---- Home render + filtering ----
+        function setNetworkFilter(network){
+            currentNetworkFilter = network;
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.getAttribute('data-network') === network);
+            });
+            renderListings();
+        }
+
+        function renderListings(){
+            const container = document.getElementById('listings');
+            const filtered = (currentNetworkFilter === 'All')
+                ? listingsData
+                : listingsData.filter(x => x.network === currentNetworkFilter);
+
+            if(!filtered.length){
+                container.innerHTML = '<div style="padding:20px;color:var(--gray);text-align:center;">No listings for this network yet.</div>';
+                return;
+            }
+
+            container.innerHTML = filtered.map(l => {
+                const fee = calcFee(l.value);
+                return `
+                <div class="listing-card" onclick="goToDetail(${l.id})">
+                    <div class="listing-header">
+                        <div>
+                            <div class="listing-user">${l.user}</div>
+                            <div class="listing-time">${l.time}</div>
+                        </div>
+                        <div class="network-badge">${l.network}</div>
+                    </div>
+
+                    <div class="listing-details">
+                        <div class="detail-item">
+                            <div class="detail-label">I Have</div>
+                            <div class="detail-value">${l.have}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">I Want</div>
+                            <div class="detail-value">${l.want}</div>
+                        </div>
+                    </div>
+
+                    <div class="listing-details" style="margin-top:4px;">
+                        <div class="detail-item">
+                            <div class="detail-label">Swap Value</div>
+                            <div class="detail-value">${formatNaira(l.value)}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Platform Fee</div>
+                            <div class="detail-value" style="color:var(--accent);">${formatNaira(fee)} <span style="font-size:12px;color:var(--gray);font-weight:500;">(15%)</span></div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ---- Trade room logic: unlock payment based on checklist ----
+        function resetTradeState(){
+            tradeState = { youSent:false, youConfirmed:false, otherSent:false, otherConfirmed:false };
+            document.querySelectorAll('#trade .checkbox').forEach(cb => cb.classList.remove('checked'));
+            updateUnlockButton();
+        }
+
+        function toggleCheck(element) {
+            element.classList.toggle('checked');
+
+            const parent = element.closest('.checklist');
+            if(!parent) return;
+
+            const title = parent.querySelector('.checklist-title')?.textContent || '';
+
+            if(title.includes('Your Actions')){
+                const boxes = Array.from(parent.querySelectorAll('.checklist-item .checkbox'));
+                const idx = boxes.indexOf(element);
+                if(idx === 0) tradeState.youSent = element.classList.contains('checked');
+                if(idx === 1) tradeState.youConfirmed = element.classList.contains('checked');
+            }
+
+            updateUnlockButton();
+
+            if(tradeState.youSent && tradeState.youConfirmed && !(tradeState.otherSent && tradeState.otherConfirmed)){
+                setTimeout(simulateOtherUserConfirmed, 900);
+            }
+        }
+
+        function simulateOtherUserConfirmed(){
+            const checklists = document.querySelectorAll('#trade .checklist');
+            const waiting = Array.from(checklists).find(c => (c.querySelector('.checklist-title')?.textContent || '').includes('Waiting for'));
+            if(!waiting) return;
+
+            const boxes = waiting.querySelectorAll('.checklist-item .checkbox');
+            boxes.forEach(b => b.classList.add('checked'));
+
+            tradeState.otherSent = true;
+            tradeState.otherConfirmed = true;
+            updateUnlockButton();
+        }
+
+        function updateUnlockButton(){
+            const btn = document.getElementById('payUnlockBtn');
+            if(!btn) return;
+
+            const ready = tradeState.youSent && tradeState.youConfirmed && tradeState.otherSent && tradeState.otherConfirmed;
+            btn.textContent = ready ? 'Continue to Fee Payment' : "I've Sent the Data";
+            btn.style.opacity = ready ? '1' : '0.88';
+        }
+
+        function tryUnlockPayment(){
+            const ready = tradeState.youSent && tradeState.youConfirmed && tradeState.otherSent && tradeState.otherConfirmed;
+            if(!ready){
+                alert('Complete the checklist first. (Demo: the other user confirms after you finish your two steps.)');
+                return;
+            }
+            goToPayment();
+        }
+
+        function cancelSwap(){
+            const ok = confirm('Cancel this swap? (Demo: this will reset the trade and return home.)');
+            if(!ok) return;
+            resetTradeState();
+            goToHome();
+        }
 
         function showPosted() {
             alert('Listing posted! (Demo - not saved)');
             goToHome();
         }
 
-        function toggleCheck(element) {
-            element.classList.toggle('checked');
+        function shareInvite(){
+            if(navigator.share){
+                navigator.share({ title: 'Data Swap', text: 'Check out the Data Swap demo', url: window.location.href }).catch(()=>{});
+            }else{
+                prompt('Copy and share this link:', window.location.href);
+            }
         }
 
         // Prevent actual form submissions
         document.addEventListener('submit', (e) => e.preventDefault());
+
+        // Initial render
+        renderListings();
     </script>
+
 </body>
 </html>
