@@ -3,654 +3,232 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a0a">
     <title>Data Swap — Interactive Demo</title>
-    <meta name="description" content="Experience Data Swap's mobile-first P2P data exchange platform">
+    <meta name="description" content="High-fidelity interactive demo of Data Swap MVP flow">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        * {
+        /* ========================================
+           RESET & BASE STYLES
+           ======================================== */
+        *, *::before, *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
         }
 
         :root {
-            --bg: #0a0a0a;
-            --surface: #141414;
-            --card: #1a1a1a;
-            --border: rgba(255, 255, 255, 0.08);
-            --text: #fafafa;
+            /* Colors */
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #141414;
+            --bg-tertiary: #1a1a1a;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --text-primary: #fafafa;
             --text-secondary: #888888;
-            --accent: #0052cc;
+            --text-tertiary: #666666;
+            --accent-primary: #0052cc;
             --accent-hover: #0066ff;
-            --green: #00a86b;
-            --orange: #ff6b35;
+            --success: #00a86b;
+            --warning: #ff6b35;
+            
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 12px;
+            --spacing-lg: 16px;
+            --spacing-xl: 20px;
+            --spacing-2xl: 24px;
+            
+            /* Typography */
+            --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+            --text-xs: 11px;
+            --text-sm: 12px;
+            --text-base: 14px;
+            --text-lg: 16px;
+            --text-xl: 18px;
+            --text-2xl: 24px;
+            --text-3xl: 32px;
+            
+            /* Transitions */
+            --transition-fast: 150ms ease;
+            --transition-base: 200ms ease;
+            --transition-slow: 300ms ease;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.4);
+            
+            /* Border Radius */
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-xl: 16px;
+            --radius-full: 9999px;
+            
+            /* Z-index */
+            --z-base: 1;
+            --z-dropdown: 100;
+            --z-sticky: 200;
+            --z-fixed: 300;
+            --z-modal: 1000;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
         }
 
         body {
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            font-family: var(--font-body);
+            font-size: var(--text-base);
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-primary);
             overflow-x: hidden;
         }
 
-        #app {
+        /* ========================================
+           UTILITY CLASSES
+           ======================================== */
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .text-center { text-align: center; }
+        .text-muted { color: var(--text-secondary); }
+        .text-accent { color: var(--accent-primary); }
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+
+        /* ========================================
+           LAYOUT COMPONENTS
+           ======================================== */
+        .app {
             max-width: 480px;
             margin: 0 auto;
             min-height: 100vh;
-            background: var(--bg);
+            background: var(--bg-primary);
             position: relative;
+            padding-bottom: 65px;
         }
 
-        .screen { display: none; }
-        .screen.active { display: block; animation: fadeIn 0.3s ease; }
+        .screen {
+            display: none;
+            opacity: 0;
+            animation: fadeIn var(--transition-base);
+        }
+
+        .screen.active {
+            display: block;
+            opacity: 1;
+        }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Demo Badge */
-        .demo-badge {
-            position: fixed;
-            top: 12px;
-            right: 12px;
-            z-index: 1000;
-            background: var(--orange);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 16px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Header */
         .header {
             position: sticky;
             top: 0;
-            z-index: 100;
-            background: var(--surface);
+            z-index: var(--z-sticky);
+            background: var(--bg-secondary);
             backdrop-filter: blur(10px);
-            border-bottom: 1px solid var(--border);
-            padding: 14px 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--spacing-lg) var(--spacing-xl);
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: var(--spacing-lg);
         }
 
         .header-title {
-            font-size: 18px;
+            font-size: var(--text-xl);
             font-weight: 700;
+            flex: 1;
+            text-align: center;
         }
 
-        .back-btn {
+        .header-action {
             background: none;
             border: none;
-            color: var(--accent);
-            font-size: 15px;
+            color: var(--accent-primary);
+            font-size: var(--text-lg);
             font-weight: 600;
             cursor: pointer;
-            padding: 4px 0;
-        }
-
-        /* Content */
-        .content {
-            padding: 0 0 80px 0;
-        }
-
-        /* Feed */
-        .feed-header {
-            padding: 24px 20px 16px;
-        }
-
-        .feed-title {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 6px;
-            letter-spacing: -0.02em;
-        }
-
-        .feed-subtitle {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .filter-tabs {
-            display: flex;
-            gap: 8px;
-            padding: 0 20px 16px;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .filter-tab {
-            padding: 8px 16px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
-        }
-
-        .filter-tab.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-        }
-
-        .listings {
-            padding: 0 20px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .listing-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .listing-card:active {
-            transform: scale(0.98);
-            border-color: var(--accent);
-        }
-
-        .listing-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 15px;
-        }
-
-        .user-details {
-            flex: 1;
-        }
-
-        .user-name {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 2px;
-        }
-
-        .user-meta {
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-
-        .status-badge {
-            padding: 4px 10px;
-            background: rgba(0, 168, 107, 0.1);
-            border: 1px solid rgba(0, 168, 107, 0.2);
-            border-radius: 12px;
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--green);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-
-        .swap-display {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 12px;
-            align-items: center;
-            margin-bottom: 16px;
-        }
-
-        .swap-side {
-            text-align: center;
-        }
-
-        .swap-label {
-            font-size: 10px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 6px;
-        }
-
-        .swap-amount {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .swap-network {
-            font-size: 12px;
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        .swap-arrow {
-            font-size: 20px;
-            color: var(--text-secondary);
-        }
-
-        .listing-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-top: 12px;
-            border-top: 1px solid var(--border);
-            font-size: 12px;
-        }
-
-        .listing-time {
-            color: var(--text-secondary);
-        }
-
-        .listing-fee {
-            color: var(--accent);
-            font-weight: 600;
-        }
-
-        /* Detail */
-        .detail-container {
-            padding: 20px;
-        }
-
-        .detail-user {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .detail-avatar {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 22px;
-        }
-
-        .detail-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 24px;
-            margin-bottom: 20px;
-        }
-
-        .detail-swap {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 16px;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .detail-swap .swap-amount {
-            font-size: 32px;
-        }
-
-        .detail-swap .swap-arrow {
-            font-size: 28px;
-        }
-
-        .info-section {
-            margin-bottom: 24px;
-        }
-
-        .section-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 12px;
-        }
-
-        .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .info-row:last-child {
-            border-bottom: none;
-        }
-
-        .info-label {
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .info-value {
-            font-size: 14px;
-            font-weight: 600;
-        }
-
-        .how-it-works {
-            font-size: 13px;
-            color: var(--text-secondary);
-            line-height: 1.7;
-        }
-
-        /* Trade Room */
-        .trade-container {
-            padding: 20px;
-        }
-
-        .progress-bar {
-            margin-bottom: 32px;
-        }
-
-        .progress-steps {
-            display: flex;
-            justify-content: space-between;
-            position: relative;
-            margin-bottom: 12px;
-        }
-
-        .progress-line {
-            position: absolute;
-            top: 16px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--border);
-        }
-
-        .progress-fill {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            background: var(--accent);
-            transition: width 0.3s ease;
-        }
-
-        .step {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .step-circle {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background: var(--surface);
-            border: 2px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-secondary);
-            transition: all 0.3s;
-        }
-
-        .step-circle.active {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: white;
-            box-shadow: 0 0 0 4px rgba(0, 82, 204, 0.2);
-        }
-
-        .step-circle.completed {
-            background: var(--green);
-            border-color: var(--green);
-            color: white;
-        }
-
-        .step-label {
-            font-size: 10px;
-            color: var(--text-secondary);
-            text-align: center;
-            line-height: 1.2;
-        }
-
-        .checklist {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .checklist-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-        }
-
-        .check-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-            cursor: pointer;
-        }
-
-        .check-item:last-child {
-            border-bottom: none;
-        }
-
-        .checkbox {
-            width: 24px;
-            height: 24px;
+            padding: var(--spacing-sm);
+            transition: opacity var(--transition-fast);
             min-width: 24px;
-            border-radius: 6px;
-            border: 2px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
         }
 
-        .checkbox.checked {
-            background: var(--green);
-            border-color: var(--green);
+        .header-action:hover {
+            opacity: 0.8;
         }
 
-        .check-text {
-            flex: 1;
-            font-size: 14px;
-            line-height: 1.5;
+        .header-action:active {
+            opacity: 0.6;
         }
 
-        .payment-display {
-            text-align: center;
-            padding: 24px;
-        }
-
-        .payment-label {
-            font-size: 13px;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-        }
-
-        .payment-amount {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 8px;
-        }
-
-        .payment-note {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .success-screen {
-            padding: 60px 20px;
-            text-align: center;
-        }
-
-        .success-icon {
-            font-size: 72px;
-            margin-bottom: 24px;
-            animation: bounce 0.6s ease;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-
-        .success-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .success-text {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-        }
-
-        /* Action Button */
-        .action-btn {
-            width: 100%;
-            padding: 16px;
-            background: var(--accent);
+        /* Demo Badge */
+        .demo-badge {
+            position: fixed;
+            top: var(--spacing-lg);
+            right: var(--spacing-lg);
+            z-index: var(--z-modal);
+            background: var(--warning);
             color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .action-btn:active {
-            transform: scale(0.98);
-        }
-
-        .action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .action-btn.secondary {
-            background: var(--card);
-            color: var(--text);
-            border: 1px solid var(--border);
-            margin-top: 12px;
-        }
-
-        /* Post Form */
-        .form-container {
-            padding: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--text-secondary);
+            padding: 6px var(--spacing-md);
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
+            box-shadow: var(--shadow-md);
+            pointer-events: none;
         }
 
-        .form-input, .form-select {
-            width: 100%;
-            padding: 14px;
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text);
-            font-size: 15px;
-            font-family: inherit;
+        /* Content Container */
+        .content {
+            padding-bottom: 20px;
         }
 
-        .form-input:focus, .form-select:focus {
-            outline: none;
-            border-color: var(--accent);
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
-
-        .fee-preview {
-            background: rgba(0, 82, 204, 0.1);
-            border: 1px solid rgba(0, 82, 204, 0.2);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            margin-top: 24px;
-        }
-
-        .fee-label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-
-        .fee-amount {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        /* Bottom Nav */
+        /* ========================================
+           BOTTOM NAVIGATION
+           ======================================== */
         .bottom-nav {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            padding: var(--spacing-sm) 0;
+            padding-bottom: calc(var(--spacing-sm) + env(safe-area-inset-bottom));
             max-width: 480px;
             margin: 0 auto;
-            background: var(--surface);
-            border-top: 1px solid var(--border);
-            display: flex;
-            padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
-            z-index: 100;
+            z-index: var(--z-fixed);
         }
 
         .nav-item {
@@ -658,520 +236,1450 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             gap: 4px;
-            padding: 8px;
+            padding: var(--spacing-sm);
             background: none;
             border: none;
             color: var(--text-secondary);
-            font-size: 11px;
+            font-size: var(--text-xs);
             cursor: pointer;
-            transition: color 0.2s;
+            transition: color var(--transition-fast);
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
         }
 
         .nav-item.active {
-            color: var(--accent);
+            color: var(--accent-primary);
+        }
+
+        .nav-item:active {
+            opacity: 0.6;
         }
 
         .nav-icon {
             font-size: 22px;
         }
 
-        /* Empty State */
+        /* ========================================
+           FEED COMPONENTS
+           ======================================== */
+        .feed-header {
+            padding: var(--spacing-2xl) var(--spacing-xl) var(--spacing-lg);
+        }
+
+        .feed-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+            letter-spacing: -0.02em;
+        }
+
+        .feed-subtitle {
+            font-size: var(--text-base);
+            color: var(--text-secondary);
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: var(--spacing-sm);
+            padding: 0 var(--spacing-xl) var(--spacing-lg);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .filter-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-tab {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-full);
+            font-size: var(--text-sm);
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            user-select: none;
+        }
+
+        .filter-tab.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        .filter-tab:hover:not(.active) {
+            background: var(--bg-secondary);
+        }
+
+        /* Listings */
+        .listings {
+            padding: 0 var(--spacing-xl) var(--spacing-2xl);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .listing-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-lg);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .listing-card:active {
+            transform: scale(0.98);
+            border-color: var(--accent-primary);
+        }
+
+        @media (hover: hover) {
+            .listing-card:hover {
+                border-color: var(--accent-primary);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+        }
+
+        .listing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .listing-user-section {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: var(--text-lg);
+            color: white;
+        }
+
+        .listing-user-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .listing-user-name {
+            font-size: var(--text-base);
+            font-weight: 600;
+            margin-bottom: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: var(--radius-full);
+            background: var(--success);
+            flex-shrink: 0;
+        }
+
+        .status-dot.inactive {
+            background: var(--text-tertiary);
+        }
+
+        .listing-meta {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .meta-separator {
+            color: var(--border-color);
+        }
+
+        .network-badge {
+            padding: 4px 10px;
+            background: rgba(0, 82, 204, 0.1);
+            border: 1px solid rgba(0, 82, 204, 0.2);
+            border-radius: var(--radius-md);
+            font-size: var(--text-xs);
+            font-weight: 600;
+            color: var(--accent-primary);
+            white-space: nowrap;
+        }
+
+        .listing-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+
+        .detail-label {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .detail-value {
+            font-size: var(--text-lg);
+            font-weight: 600;
+        }
+
+        /* ========================================
+           FORM COMPONENTS
+           ======================================== */
+        .form-container {
+            padding: var(--spacing-2xl) var(--spacing-xl) 120px;
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--text-sm);
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+
+        .form-input,
+        .form-select {
+            width: 100%;
+            padding: 14px var(--spacing-lg);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: var(--text-lg);
+            font-family: var(--font-body);
+            transition: all var(--transition-base);
+        }
+
+        .form-input:focus,
+        .form-select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            background: var(--bg-secondary);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        /* Radio Group */
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .radio-option {
+            position: relative;
+        }
+
+        .radio-option input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .radio-label {
+            display: block;
+            padding: var(--spacing-md);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            text-align: center;
+            font-size: var(--text-base);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            user-select: none;
+        }
+
+        .radio-option input:checked + .radio-label {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+
+        /* ========================================
+           BUTTON COMPONENTS
+           ======================================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: var(--spacing-lg);
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: var(--text-lg);
+            font-weight: 600;
+            font-family: var(--font-body);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-secondary);
+        }
+
+        .btn + .btn {
+            margin-top: var(--spacing-md);
+        }
+
+        /* ========================================
+           CARD COMPONENTS
+           ======================================== */
+        .card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-2xl);
+        }
+
+        .card-section {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .card-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .card-title {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--border-color);
+            gap: var(--spacing-md);
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .data-row:first-child {
+            padding-top: 0;
+        }
+
+        .data-row-label {
+            font-size: var(--text-base);
+            color: var(--text-secondary);
+        }
+
+        .data-row-value {
+            font-size: var(--text-base);
+            font-weight: 600;
+            text-align: right;
+        }
+
+        /* User Header for Detail Pages */
+        .user-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .user-avatar-large {
+            width: 56px;
+            height: 56px;
+            min-width: 56px;
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 22px;
+            color: white;
+        }
+
+        .user-details-extended {
+            flex: 1;
+        }
+
+        .user-name-large {
+            font-size: var(--text-xl);
+            font-weight: 700;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .user-stats {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .user-stat {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* ========================================
+           TRADE ROOM COMPONENTS
+           ======================================== */
+        .checklist {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .checklist-title {
+            font-size: var(--text-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: opacity var(--transition-fast);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .checklist-item:first-child {
+            padding-top: 0;
+        }
+
+        .checklist-item:active {
+            opacity: 0.7;
+        }
+
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all var(--transition-base);
+            margin-top: 2px;
+        }
+
+        .checkbox.checked {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-size: var(--text-sm);
+            font-weight: 700;
+        }
+
+        .checklist-text {
+            flex: 1;
+            font-size: var(--text-base);
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Info Box */
+        .info-box {
+            background: rgba(0, 82, 204, 0.08);
+            border: 1px solid rgba(0, 82, 204, 0.2);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .info-box-title {
+            font-size: var(--text-sm);
+            font-weight: 600;
+            color: var(--accent-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .info-box-text {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ========================================
+           BOTTOM ACTIONS
+           ======================================== */
+        .bottom-actions {
+            position: fixed;
+            bottom: 65px;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: var(--spacing-lg) var(--spacing-xl);
+            max-width: 480px;
+            margin: 0 auto;
+            z-index: var(--z-dropdown);
+        }
+
+        /* ========================================
+           SUCCESS SCREEN
+           ======================================== */
+        .success-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px var(--spacing-xl);
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-bottom: var(--spacing-2xl);
+            animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .success-title {
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .success-text {
+            font-size: var(--text-lg);
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        /* ========================================
+           PROFILE SCREEN
+           ======================================== */
+        .profile-container {
+            padding: var(--spacing-2xl) var(--spacing-xl);
+        }
+
+        .profile-header {
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--spacing-lg);
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-hover));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 32px;
+            color: white;
+        }
+
+        .profile-name {
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .profile-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: var(--spacing-lg);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+        }
+
+        .stat-value {
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ========================================
+           EMPTY STATE
+           ======================================== */
         .empty-state {
-            padding: 80px 20px;
+            padding: 80px var(--spacing-xl);
             text-align: center;
         }
 
         .empty-icon {
-            font-size: 56px;
-            margin-bottom: 16px;
+            font-size: 48px;
+            margin-bottom: var(--spacing-lg);
             opacity: 0.3;
         }
 
         .empty-title {
-            font-size: 18px;
+            font-size: var(--text-xl);
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: var(--spacing-sm);
         }
 
         .empty-text {
-            font-size: 14px;
+            font-size: var(--text-base);
             color: var(--text-secondary);
         }
 
-        /* Responsive */
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
         @media (max-width: 480px) {
-            .filter-tabs::-webkit-scrollbar {
-                display: none;
+            :root {
+                --spacing-xl: 16px;
+                --spacing-2xl: 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="demo-badge">DEMO MODE</div>
+    <div class="demo-badge" role="status" aria-live="polite">DEMO MODE</div>
     
-    <div id="app">
-        <!-- Feed Screen -->
-        <div id="feedScreen" class="screen active">
-            <div class="header">
-                <div class="header-title">Data Swap</div>
-            </div>
-            
-            <div class="content">
-                <div class="feed-header">
-                    <h1 class="feed-title">Available Swaps</h1>
-                    <p class="feed-subtitle" id="listingCount">Loading...</p>
-                </div>
-                
-                <div class="filter-tabs">
-                    <button class="filter-tab active" onclick="filterListings('all')">All Networks</button>
-                    <button class="filter-tab" onclick="filterListings('MTN')">MTN</button>
-                    <button class="filter-tab" onclick="filterListings('Airtel')">Airtel</button>
-                    <button class="filter-tab" onclick="filterListings('Glo')">Glo</button>
-                </div>
-                
-                <div class="listings" id="listingsContainer"></div>
-            </div>
-
-            <div class="bottom-nav">
-                <button class="nav-item active">
-                    <div class="nav-icon">🏠</div>
-                    <div>Feed</div>
-                </button>
-                <button class="nav-item" onclick="showScreen('post')">
-                    <div class="nav-icon">➕</div>
-                    <div>Post</div>
-                </button>
-                <button class="nav-item" onclick="showScreen('profile')">
-                    <div class="nav-icon">👤</div>
-                    <div>Profile</div>
-                </button>
-            </div>
-        </div>
-
-        <!-- Detail Screen -->
-        <div id="detailScreen" class="screen">
-            <div class="header">
-                <button class="back-btn" onclick="showScreen('feed')">← Back</button>
-                <div class="header-title">Swap Details</div>
-                <div style="width: 50px;"></div>
-            </div>
-
-            <div class="content">
-                <div class="detail-container">
-                    <div class="detail-user">
-                        <div class="detail-avatar" id="detailAvatar">CA</div>
-                        <div class="user-details">
-                            <div class="user-name" style="font-size: 18px; margin-bottom: 4px;" id="detailName">Chioma A.</div>
-                            <div class="user-meta" style="font-size: 13px;" id="detailMeta">⭐ 4.8 · 12 swaps</div>
-                        </div>
-                    </div>
-
-                    <div class="detail-card">
-                        <div class="detail-swap">
-                            <div class="swap-side">
-                                <div class="swap-label">They're Offering</div>
-                                <div class="swap-amount" id="detailOffering">5GB</div>
-                                <div class="swap-network" id="detailOfferingNet">MTN</div>
-                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;" id="detailOfferingType">Night</div>
-                            </div>
-                            <div class="swap-arrow">⇄</div>
-                            <div class="swap-side">
-                                <div class="swap-label">They Want</div>
-                                <div class="swap-amount" id="detailSeeking">5GB</div>
-                                <div class="swap-network" id="detailSeekingNet">MTN</div>
-                                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 4px;" id="detailSeekingType">Day</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="info-section">
-                        <div class="section-title">Details</div>
-                        <div class="info-row">
-                            <span class="info-label">Platform Fee</span>
-                            <span class="info-value" id="detailFee">₦50</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Network</span>
-                            <span class="info-value" id="detailNetwork">MTN</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Posted</span>
-                            <span class="info-value" id="detailTime">2 min ago</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="info-label">Status</span>
-                            <span class="info-value" style="color: var(--green);">Active</span>
-                        </div>
-                    </div>
-
-                    <div class="info-section">
-                        <div class="section-title">How It Works</div>
-                        <div class="how-it-works">
-                            1. Initiate swap<br>
-                            2. Both users confirm data sent via USSD<br>
-                            3. Pay platform fee after confirmation<br>
-                            4. Final confirmation from both parties<br>
-                            5. Swap complete!
-                        </div>
-                    </div>
-
-                    <button class="action-btn" onclick="startTrade()">Start Swap</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Trade Screen -->
-        <div id="tradeScreen" class="screen">
-            <div class="header">
-                <button class="back-btn" onclick="showScreen('detail')">← Back</button>
-                <div class="header-title">Trade Room</div>
-                <div style="width: 50px;"></div>
-            </div>
-
-            <div class="content">
-                <div class="trade-container">
-                    <div class="progress-bar">
-                        <div class="progress-steps">
-                            <div class="progress-line">
-                                <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
-                            </div>
-                            <div class="step">
-                                <div class="step-circle active" id="step1">1</div>
-                                <div class="step-label">Confirm<br>Sent</div>
-                            </div>
-                            <div class="step">
-                                <div class="step-circle" id="step2">2</div>
-                                <div class="step-label">Payment</div>
-                            </div>
-                            <div class="step">
-                                <div class="step-circle" id="step3">3</div>
-                                <div class="step-label">Final<br>Check</div>
-                            </div>
-                            <div class="step">
-                                <div class="step-circle" id="step4">✓</div>
-                                <div class="step-label">Done</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="tradeStep1">
-                        <div class="checklist">
-                            <div class="checklist-title">Step 1: Send Your Data</div>
-                            <div class="check-item" onclick="toggleCheck('check1')">
-                                <div class="checkbox" id="check1"></div>
-                                <div class="check-text">Dial *131*2*1# to transfer data to their number</div>
-                            </div>
-                            <div class="check-item" onclick="toggleCheck('check2')">
-                                <div class="checkbox" id="check2"></div>
-                                <div class="check-text">Wait for SMS confirmation from network</div>
-                            </div>
-                            <div class="check-item" onclick="toggleCheck('check3')">
-                                <div class="checkbox" id="check3"></div>
-                                <div class="check-text">Screenshot confirmation (recommended)</div>
-                            </div>
-                        </div>
-                        <button class="action-btn" id="step1Btn" onclick="goToStep(2)" disabled>I've Sent Data →</button>
-                        <button class="action-btn secondary">Report Issue</button>
-                    </div>
-
-                    <div id="tradeStep2" style="display: none;">
-                        <div class="checklist">
-                            <div class="checklist-title">Step 2: Payment</div>
-                            <div class="payment-display">
-                                <div class="payment-label">Both users confirmed data sent</div>
-                                <div class="payment-amount" id="paymentAmount">₦50</div>
-                                <div class="payment-note">Platform service fee</div>
-                            </div>
-                        </div>
-                        <button class="action-btn" onclick="goToStep(3)">Pay with Paystack →</button>
-                        <div style="font-size: 11px; color: var(--text-secondary); text-align: center; margin-top: 12px;">
-                            Secure payment powered by Paystack
-                        </div>
-                    </div>
-
-                    <div id="tradeStep3" style="display: none;">
-                        <div class="checklist">
-                            <div class="checklist-title">Step 3: Final Confirmation</div>
-                            <div class="check-item" onclick="toggleCheck('check4')">
-                                <div class="checkbox" id="check4"></div>
-                                <div class="check-text" id="confirmText">I confirm I received the data</div>
-                            </div>
-                            <div class="check-item" onclick="toggleCheck('check5')">
-                                <div class="checkbox" id="check5"></div>
-                                <div class="check-text">Data type and amount are correct</div>
-                            </div>
-                        </div>
-                        <button class="action-btn" id="step3Btn" onclick="goToStep(4)" disabled>Complete Swap ✓</button>
-                    </div>
-
-                    <div id="tradeStep4" style="display: none;">
-                        <div class="success-screen">
-                            <div class="success-icon">🎉</div>
-                            <div class="success-title">Swap Complete!</div>
-                            <div class="success-text" id="successText">You successfully completed your swap</div>
-                            <button class="action-btn" onclick="showScreen('feed')">Back to Feed</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Post Screen -->
-        <div id="postScreen" class="screen">
-            <div class="header">
-                <button class="back-btn" onclick="showScreen('feed')">Cancel</button>
-                <div class="header-title">Post Swap</div>
-                <div style="width: 50px;"></div>
-            </div>
-
-            <div class="content">
-                <div class="form-container">
-                    <div class="form-group">
-                        <label class="form-label">You're Offering</label>
-                        <div class="form-grid">
-                            <input class="form-input" type="number" placeholder="Amount (GB)" id="offeringAmount">
-                            <select class="form-select" id="offeringNetwork">
-                                <option>MTN</option>
-                                <option>Airtel</option>
-                                <option>Glo</option>
-                                <option>9mobile</option>
-                            </select>
-                        </div>
-                        <select class="form-select" style="margin-top: 12px;" id="offeringType">
-                            <option>Day Data</option>
-                            <option>Night Data</option>
-                            <option>Weekend Data</option>
-                            <option>Weekday Data</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">You Want</label>
-                        <div class="form-grid">
-                            <input class="form-input" type="number" placeholder="Amount (GB)" id="seekingAmount">
-                            <select class="form-select" id="seekingNetwork">
-                                <option>MTN</option>
-                                <option>Airtel</option>
-                                <option>Glo</option>
-                                <option>9mobile</option>
-                            </select>
-                        </div>
-                        <select class="form-select" style="margin-top: 12px;" id="seekingType">
-                            <option>Day Data</option>
-                            <option>Night Data</option>
-                            <option>Weekend Data</option>
-                            <option>Weekday Data</option>
-                        </select>
-                    </div>
-
-                    <div class="fee-preview">
-                        <div class="fee-label">Estimated Platform Fee</div>
-                        <div class="fee-amount">₦30</div>
-                    </div>
-
-                    <button class="action-btn" style="margin-top: 24px;" onclick="submitPost()">Post Listing</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Profile Screen -->
-        <div id="profileScreen" class="screen">
-            <div class="header">
-                <div></div>
-                <div class="header-title">Profile</div>
-                <div></div>
-            </div>
-
-            <div class="content">
-                <div class="empty-state">
-                    <div class="empty-icon">👤</div>
-                    <div class="empty-title">Profile</div>
-                    <div class="empty-text">View your swap history, settings, and stats</div>
-                </div>
-            </div>
-
-            <div class="bottom-nav">
-                <button class="nav-item" onclick="showScreen('feed')">
-                    <div class="nav-icon">🏠</div>
-                    <div>Feed</div>
-                </button>
-                <button class="nav-item" onclick="showScreen('post')">
-                    <div class="nav-icon">➕</div>
-                    <div>Post</div>
-                </button>
-                <button class="nav-item active">
-                    <div class="nav-icon">👤</div>
-                    <div>Profile</div>
-                </button>
-            </div>
-        </div>
+    <div class="app" id="app">
+        <!-- Screens will be injected here by JavaScript -->
     </div>
 
     <script>
-        const listings = [
-            { id: 1, avatar: 'CA', name: 'Chioma A.', rating: '4.8', swaps: '12', offering: '5GB', offeringNetwork: 'MTN', offeringType: 'Night', seeking: '5GB', seekingNetwork: 'MTN', seekingType: 'Day', fee: '50', time: '2 min ago' },
-            { id: 2, avatar: 'IM', name: 'Ibrahim M.', rating: '5.0', swaps: '24', offering: '2GB', offeringNetwork: 'Airtel', offeringType: 'Day', seeking: '2GB', seekingNetwork: 'Airtel', seekingType: 'Night', fee: '30', time: '15 min ago' },
-            { id: 3, avatar: 'FO', name: 'Funke O.', rating: '4.9', swaps: '8', offering: '10GB', offeringNetwork: 'Glo', offeringType: 'Weekend', seeking: '10GB', seekingNetwork: 'Glo', seekingType: 'Weekday', fee: '50', time: '1 hr ago' },
-            { id: 4, avatar: 'TB', name: 'Tunde B.', rating: '4.7', swaps: '15', offering: '3GB', offeringNetwork: 'MTN', offeringType: 'Night', seeking: '3GB', seekingNetwork: 'MTN', seekingType: 'Day', fee: '30', time: '3 hr ago' },
-            { id: 5, avatar: 'AN', name: 'Ada N.', rating: '4.9', swaps: '19', offering: '7GB', offeringNetwork: 'Airtel', offeringType: 'Weekday', seeking: '7GB', seekingNetwork: 'Airtel', seekingType: 'Weekend', fee: '50', time: '5 hr ago' }
+        'use strict';
+
+        // ==========================================
+        // CONSTANTS & CONFIGURATION
+        // ==========================================
+        const CONFIG = {
+            FEE_RATE: 0.15,
+            INITIAL_CREDITS: 10,
+            CURRENCY: '₦',
+            NETWORKS: ['All', 'MTN', 'Airtel', 'Glo', '9mobile']
+        };
+
+        // ==========================================
+        // DATA MODELS
+        // ==========================================
+        const MOCK_LISTINGS = [
+            {
+                id: 1,
+                user: 'Chioma A.',
+                avatar: 'CA',
+                rating: 4.8,
+                totalSwaps: 12,
+                isActive: true,
+                time: '5 mins ago',
+                network: 'MTN',
+                have: '5GB Night',
+                want: '5GB Day',
+                value: 200,
+                expiresInDays: 3
+            },
+            {
+                id: 2,
+                user: 'Amara O.',
+                avatar: 'AO',
+                rating: 5.0,
+                totalSwaps: 24,
+                isActive: true,
+                time: '12 mins ago',
+                network: 'Airtel',
+                have: '2GB Weekend',
+                want: '2GB Anytime',
+                value: 150,
+                expiresInDays: 2
+            },
+            {
+                id: 3,
+                user: 'Tunde K.',
+                avatar: 'TK',
+                rating: 4.9,
+                totalSwaps: 18,
+                isActive: false,
+                time: '24 mins ago',
+                network: 'MTN',
+                have: '10GB Night',
+                want: '8GB Day',
+                value: 400,
+                expiresInDays: 5
+            },
+            {
+                id: 4,
+                user: 'Nike B.',
+                avatar: 'NB',
+                rating: 4.7,
+                totalSwaps: 9,
+                isActive: true,
+                time: '31 mins ago',
+                network: 'Glo',
+                have: '3GB Night',
+                want: '3GB Day',
+                value: 180,
+                expiresInDays: 1
+            },
+            {
+                id: 5,
+                user: 'Emeka S.',
+                avatar: 'ES',
+                rating: 4.9,
+                totalSwaps: 31,
+                isActive: true,
+                time: '45 mins ago',
+                network: 'Airtel',
+                have: '7GB Weekend',
+                want: '7GB Weekday',
+                value: 280,
+                expiresInDays: 4
+            }
         ];
 
-        let currentListing = null;
-        let currentStep = 1;
-        let checks = {};
-        let currentFilter = 'all';
+        // Current user profile
+        const CURRENT_USER = {
+            name: 'You',
+            avatar: 'YO',
+            rating: 4.9,
+            totalSwaps: 15,
+            isActive: true
+        };
 
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId + 'Screen').classList.add('active');
-            
-            // Update nav
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            if (screenId === 'feed') {
-                document.querySelectorAll('.nav-item')[0].classList.add('active');
-            } else if (screenId === 'profile') {
-                document.querySelectorAll('.nav-item')[2].classList.add('active');
+        // ==========================================
+        // STATE MANAGEMENT
+        // ==========================================
+        class AppState {
+            constructor() {
+                this.currentScreen = 'feed';
+                this.currentFilter = 'All';
+                this.selectedListing = null;
+                this.creditsBalance = CONFIG.INITIAL_CREDITS;
+                this.tradeChecks = {
+                    userSent: false,
+                    userConfirmed: false,
+                    otherSent: false,
+                    otherConfirmed: false
+                };
+            }
+
+            setScreen(screenName) {
+                this.currentScreen = screenName;
+                this.render();
+            }
+
+            setFilter(filter) {
+                this.currentFilter = filter;
+                this.render();
+            }
+
+            selectListing(id) {
+                this.selectedListing = MOCK_LISTINGS.find(l => l.id === id);
+                this.setScreen('detail');
+            }
+
+            resetTrade() {
+                this.tradeChecks = {
+                    userSent: false,
+                    userConfirmed: false,
+                    otherSent: false,
+                    otherConfirmed: false
+                };
+            }
+
+            render() {
+                router.navigate(this.currentScreen);
             }
         }
 
-        function filterListings(network) {
-            currentFilter = network;
-            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            renderListings();
-        }
+        const state = new AppState();
 
-        function renderListings() {
-            const container = document.getElementById('listingsContainer');
-            const filtered = currentFilter === 'all' ? listings : listings.filter(l => l.offeringNetwork === currentFilter);
-            
-            document.getElementById('listingCount').textContent = `${filtered.length} active listing${filtered.length !== 1 ? 's' : ''}`;
-            
-            container.innerHTML = filtered.map(listing => `
-                <div class="listing-card" onclick="showDetail(${listing.id})">
-                    <div class="listing-header">
-                        <div class="user-info">
-                            <div class="user-avatar">${listing.avatar}</div>
-                            <div class="user-details">
-                                <div class="user-name">${listing.name}</div>
-                                <div class="user-meta">⭐ ${listing.rating} · ${listing.swaps} swaps</div>
+        // ==========================================
+        // UTILITY FUNCTIONS
+        // ==========================================
+        const utils = {
+            formatCurrency(amount) {
+                try {
+                    return `${CONFIG.CURRENCY}${Number(amount).toLocaleString('en-NG')}`;
+                } catch {
+                    return `${CONFIG.CURRENCY}${amount}`;
+                }
+            },
+
+            calculateFee(value) {
+                return Math.round(Number(value) * CONFIG.FEE_RATE);
+            },
+
+            formatExpiry(days) {
+                return `Expires in ${days} day${days === 1 ? '' : 's'}`;
+            },
+
+            getInitials(name) {
+                return name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+            },
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        };
+
+        // ==========================================
+        // COMPONENT TEMPLATES
+        // ==========================================
+        const templates = {
+            header(title, showBack = false) {
+                return `
+                    <div class="header">
+                        ${showBack ? '<button class="header-action" onclick="router.back()">←</button>' : '<div style="width: 24px;"></div>'}
+                        <h1 class="header-title">${utils.escapeHtml(title)}</h1>
+                        <div style="width: 24px;"></div>
+                    </div>
+                `;
+            },
+
+            bottomNav(activeScreen) {
+                return `
+                    <nav class="bottom-nav">
+                        <button class="nav-item ${activeScreen === 'feed' ? 'active' : ''}" onclick="state.setScreen('feed')" aria-label="Feed">
+                            <div class="nav-icon">🏠</div>
+                            <div>Feed</div>
+                        </button>
+                        <button class="nav-item ${activeScreen === 'post' ? 'active' : ''}" onclick="state.setScreen('post')" aria-label="Post">
+                            <div class="nav-icon">➕</div>
+                            <div>Post</div>
+                        </button>
+                        <button class="nav-item ${activeScreen === 'profile' ? 'active' : ''}" onclick="state.setScreen('profile')" aria-label="Profile">
+                            <div class="nav-icon">👤</div>
+                            <div>Profile</div>
+                        </button>
+                    </nav>
+                `;
+            },
+
+            listingCard(listing) {
+                const fee = utils.calculateFee(listing.value);
+                return `
+                    <article class="listing-card" onclick="state.selectListing(${listing.id})" role="button" tabindex="0">
+                        <div class="listing-header">
+                            <div class="listing-user-section">
+                                <div class="user-avatar">${utils.escapeHtml(listing.avatar)}</div>
+                                <div class="listing-user-info">
+                                    <div class="listing-user-name">
+                                        <span>${utils.escapeHtml(listing.user)}</span>
+                                        <span class="status-dot ${listing.isActive ? '' : 'inactive'}" title="${listing.isActive ? 'Active' : 'Inactive'}"></span>
+                                    </div>
+                                    <div class="listing-meta">
+                                        <span>⭐ ${listing.rating}</span>
+                                        <span class="meta-separator">·</span>
+                                        <span>${listing.totalSwaps} swaps</span>
+                                        <span class="meta-separator">·</span>
+                                        <span>${utils.escapeHtml(listing.time)}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="network-badge">${utils.escapeHtml(listing.network)}</div>
+                        </div>
+                        <div class="listing-details">
+                            <div class="detail-item">
+                                <div class="detail-label">I Have</div>
+                                <div class="detail-value">${utils.escapeHtml(listing.have)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">I Want</div>
+                                <div class="detail-value">${utils.escapeHtml(listing.want)}</div>
                             </div>
                         </div>
-                        <div class="status-badge">Active</div>
-                    </div>
-                    <div class="swap-display">
-                        <div class="swap-side">
-                            <div class="swap-label">Offering</div>
-                            <div class="swap-amount">${listing.offering}</div>
-                            <div class="swap-network">${listing.offeringNetwork} ${listing.offeringType}</div>
+                        <div class="listing-details">
+                            <div class="detail-item">
+                                <div class="detail-label">Swap Value</div>
+                                <div class="detail-value">${utils.formatCurrency(listing.value)}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Platform Fee</div>
+                                <div class="detail-value text-accent">${utils.formatCurrency(fee)} <span class="text-muted" style="font-size: 12px; font-weight: 500;">(15%)</span></div>
+                            </div>
                         </div>
-                        <div class="swap-arrow">⇄</div>
-                        <div class="swap-side">
-                            <div class="swap-label">Seeking</div>
-                            <div class="swap-amount">${listing.seeking}</div>
-                            <div class="swap-network">${listing.seekingNetwork} ${listing.seekingType}</div>
+                    </article>
+                `;
+            },
+
+            filterTabs() {
+                return `
+                    <div class="filter-tabs" role="tablist">
+                        ${CONFIG.NETWORKS.map(network => `
+                            <button 
+                                class="filter-tab ${state.currentFilter === network ? 'active' : ''}" 
+                                role="tab"
+                                aria-selected="${state.currentFilter === network}"
+                                onclick="state.setFilter('${network}')"
+                            >
+                                ${network === 'All' ? 'All Networks' : network}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+            }
+        };
+
+        // ==========================================
+        // SCREEN COMPONENTS
+        // ==========================================
+        const screens = {
+            feed() {
+                const filtered = state.currentFilter === 'All' 
+                    ? MOCK_LISTINGS 
+                    : MOCK_LISTINGS.filter(l => l.network === state.currentFilter);
+
+                return `
+                    <div class="screen active" id="feedScreen">
+                        ${templates.header('Data Swap')}
+                        <div class="content">
+                            <div class="feed-header">
+                                <h2 class="feed-title">Available Swaps</h2>
+                                <p class="feed-subtitle">${filtered.length} active listing${filtered.length !== 1 ? 's' : ''}</p>
+                            </div>
+                            ${templates.filterTabs()}
+                            <div class="listings">
+                                ${filtered.length > 0 
+                                    ? filtered.map(l => templates.listingCard(l)).join('') 
+                                    : '<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No listings</div><div class="empty-text">No swaps available for this network</div></div>'
+                                }
+                            </div>
                         </div>
+                        ${templates.bottomNav('feed')}
                     </div>
-                    <div class="listing-footer">
-                        <div class="listing-time">${listing.time}</div>
-                        <div class="listing-fee">Fee: ₦${listing.fee}</div>
+                `;
+            },
+
+            detail() {
+                const listing = state.selectedListing;
+                if (!listing) return screens.feed();
+
+                const fee = utils.calculateFee(listing.value);
+
+                return `
+                    <div class="screen active" id="detailScreen">
+                        ${templates.header('Swap Details', true)}
+                        <div class="content">
+                            <div style="padding: 24px 20px 140px;">
+                                <div class="user-header">
+                                    <div class="user-avatar-large">${utils.escapeHtml(listing.avatar)}</div>
+                                    <div class="user-details-extended">
+                                        <div class="user-name-large">
+                                            <span>${utils.escapeHtml(listing.user)}</span>
+                                            <span class="status-dot ${listing.isActive ? '' : 'inactive'}"></span>
+                                        </div>
+                                        <div class="user-stats">
+                                            <span class="user-stat">⭐ ${listing.rating}</span>
+                                            <span class="meta-separator">·</span>
+                                            <span class="user-stat">${listing.totalSwaps} completed swaps</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-section">
+                                        <div class="card-title">Swap Details</div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">They have</span>
+                                            <span class="data-row-value">${utils.escapeHtml(listing.have)} Data</span>
+                                        </div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">They want</span>
+                                            <span class="data-row-value">${utils.escapeHtml(listing.want)} Data</span>
+                                        </div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">Network</span>
+                                            <span class="data-row-value">${utils.escapeHtml(listing.network)}</span>
+                                        </div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">Expiry</span>
+                                            <span class="data-row-value">${utils.formatExpiry(listing.expiresInDays)}</span>
+                                        </div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">Posted</span>
+                                            <span class="data-row-value">${utils.escapeHtml(listing.time)}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="card-section">
+                                        <div class="card-title">Platform Fee</div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">Swap value</span>
+                                            <span class="data-row-value">${utils.formatCurrency(listing.value)}</span>
+                                        </div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">Service charge (15%)</span>
+                                            <span class="data-row-value text-accent font-bold" style="font-size: 18px;">${utils.formatCurrency(fee)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="info-box">
+                                    <div class="info-box-title">How It Works</div>
+                                    <div class="info-box-text">
+                                        1. Request this swap<br>
+                                        2. Both users transfer data via USSD<br>
+                                        3. Confirm completion in Trade Room<br>
+                                        4. Platform fee processed after both confirm
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bottom-actions">
+                            <button class="btn" onclick="actions.startTrade()">Request Swap</button>
+                        </div>
+                        ${templates.bottomNav('feed')}
                     </div>
-                </div>
-            `).join('');
-        }
+                `;
+            },
 
-        function showDetail(id) {
-            currentListing = listings.find(l => l.id === id);
-            if (!currentListing) return;
-            
-            document.getElementById('detailAvatar').textContent = currentListing.avatar;
-            document.getElementById('detailName').textContent = currentListing.name;
-            document.getElementById('detailMeta').textContent = `⭐ ${currentListing.rating} · ${currentListing.swaps} completed swaps`;
-            document.getElementById('detailOffering').textContent = currentListing.offering;
-            document.getElementById('detailOfferingNet').textContent = currentListing.offeringNetwork;
-            document.getElementById('detailOfferingType').textContent = currentListing.offeringType;
-            document.getElementById('detailSeeking').textContent = currentListing.seeking;
-            document.getElementById('detailSeekingNet').textContent = currentListing.seekingNetwork;
-            document.getElementById('detailSeekingType').textContent = currentListing.seekingType;
-            document.getElementById('detailFee').textContent = '₦' + currentListing.fee;
-            document.getElementById('detailNetwork').textContent = currentListing.offeringNetwork;
-            document.getElementById('detailTime').textContent = currentListing.time;
-            
-            showScreen('detail');
-        }
+            trade() {
+                return `
+                    <div class="screen active" id="tradeScreen">
+                        ${templates.header('Trade Room', true)}
+                        <div class="content">
+                            <div style="padding: 24px 20px 160px;">
+                                <div class="info-box">
+                                    <div class="info-box-title">No Wallet. No Escrow.</div>
+                                    <div class="info-box-text">
+                                        You transfer data directly via USSD. 
+                                        Data Swap only facilitates confirmation.
+                                    </div>
+                                </div>
 
-        function startTrade() {
-            currentStep = 1;
-            checks = {};
-            showScreen('trade');
-            updateTradeView();
-            
-            // Update payment amount
-            document.getElementById('paymentAmount').textContent = '₦' + currentListing.fee;
-            document.getElementById('confirmText').textContent = `I confirm I received ${currentListing.seeking} ${currentListing.seekingNetwork} ${currentListing.seekingType} data`;
-            document.getElementById('successText').textContent = `You successfully swapped ${currentListing.offering} for ${currentListing.seeking}`;
-        }
+                                <div class="checklist">
+                                    <div class="checklist-title">Your Actions</div>
+                                    <div class="checklist-item" onclick="actions.toggleCheck('userSent')">
+                                        <div class="checkbox" id="check-userSent"></div>
+                                        <div class="checklist-text">Transfer data using your network's USSD code</div>
+                                    </div>
+                                    <div class="checklist-item" onclick="actions.toggleCheck('userConfirmed')">
+                                        <div class="checkbox" id="check-userConfirmed"></div>
+                                        <div class="checklist-text">Confirm you sent the data</div>
+                                    </div>
+                                </div>
 
-        function toggleCheck(id) {
-            const el = document.getElementById(id);
-            if (checks[id]) {
-                delete checks[id];
-                el.classList.remove('checked');
-                el.textContent = '';
-            } else {
-                checks[id] = true;
-                el.classList.add('checked');
-                el.textContent = '✓';
+                                <div class="checklist">
+                                    <div class="checklist-title">Waiting for ${utils.escapeHtml(state.selectedListing?.user || 'user')}</div>
+                                    <div class="checklist-item">
+                                        <div class="checkbox" id="check-otherSent"></div>
+                                        <div class="checklist-text">Other party transfers data to you</div>
+                                    </div>
+                                    <div class="checklist-item">
+                                        <div class="checkbox" id="check-otherConfirmed"></div>
+                                        <div class="checklist-text">Other party confirms they sent</div>
+                                    </div>
+                                </div>
+
+                                <p class="text-center text-muted" style="font-size: 13px; margin-top: 24px;">
+                                    Payment unlocks after both users confirm
+                                </p>
+                            </div>
+                        </div>
+                        <div class="bottom-actions">
+                            <button class="btn" id="continueBtn" onclick="actions.continueTrade()" disabled>I've Sent the Data</button>
+                            <button class="btn btn-secondary" onclick="actions.cancelTrade()">Cancel Swap</button>
+                        </div>
+                        ${templates.bottomNav('feed')}
+                    </div>
+                `;
+            },
+
+            confirmation() {
+                const listing = state.selectedListing;
+                if (!listing) return screens.feed();
+
+                const fee = utils.calculateFee(listing.value);
+
+                return `
+                    <div class="screen active" id="confirmationScreen">
+                        ${templates.header('Swap Complete')}
+                        <div class="content">
+                            <div class="success-container">
+                                <div class="success-icon">✓</div>
+                                <h2 class="success-title">Swap Successful!</h2>
+                                <p class="success-text">
+                                    You've successfully swapped ${utils.escapeHtml(listing.want)} with ${utils.escapeHtml(listing.user)}
+                                </p>
+
+                                <div class="card" style="width: 100%; text-align: left;">
+                                    <div class="card-section">
+                                        <div class="card-title">Summary</div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">You sent</span>
+                                            <span class="data-row-value">${utils.escapeHtml(listing.want)} Data</span>
+                                        </div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">You received</span>
+                                            <span class="data-row-value">${utils.escapeHtml(listing.have)} Data</span>
+                                        </div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">Platform fee</span>
+                                            <span class="data-row-value">${utils.formatCurrency(fee)}</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button class="btn" onclick="state.setScreen('feed')">Back to Home</button>
+                            </div>
+                        </div>
+                        ${templates.bottomNav('feed')}
+                    </div>
+                `;
+            },
+
+            post() {
+                return `
+                    <div class="screen active" id="postScreen">
+                        ${templates.header('Post Swap', true)}
+                        <div class="content">
+                            <div class="form-container">
+                                <div class="form-group">
+                                    <label class="form-label">Network</label>
+                                    <select class="form-select" id="postNetwork">
+                                        <option>MTN</option>
+                                        <option>Airtel</option>
+                                        <option>Glo</option>
+                                        <option>9mobile</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">I Have</label>
+                                    <div class="radio-group">
+                                        <div class="radio-option">
+                                            <input type="radio" name="have-type" id="have-night" checked>
+                                            <label class="radio-label" for="have-night">Night Data</label>
+                                        </div>
+                                        <div class="radio-option">
+                                            <input type="radio" name="have-type" id="have-weekend">
+                                            <label class="radio-label" for="have-weekend">Weekend Data</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Data Size (GB)</label>
+                                    <input type="number" class="form-input" placeholder="e.g. 5" value="5">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">I Want</label>
+                                    <div class="radio-group">
+                                        <div class="radio-option">
+                                            <input type="radio" name="want-type" id="want-day" checked>
+                                            <label class="radio-label" for="want-day">Day Data</label>
+                                        </div>
+                                        <div class="radio-option">
+                                            <input type="radio" name="want-type" id="want-anytime">
+                                            <label class="radio-label" for="want-anytime">Anytime Data</label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Data Size (GB)</label>
+                                    <input type="number" class="form-input" placeholder="e.g. 5" value="5">
+                                </div>
+
+                                <button class="btn" onclick="actions.submitPost()">Post Listing</button>
+                            </div>
+                        </div>
+                        ${templates.bottomNav('post')}
+                    </div>
+                `;
+            },
+
+            profile() {
+                return `
+                    <div class="screen active" id="profileScreen">
+                        ${templates.header('Profile')}
+                        <div class="content">
+                            <div class="profile-container">
+                                <div class="profile-header">
+                                    <div class="profile-avatar">${CURRENT_USER.avatar}</div>
+                                    <h2 class="profile-name">${utils.escapeHtml(CURRENT_USER.name)}</h2>
+                                    <div class="user-stats" style="justify-content: center;">
+                                        <span class="user-stat">⭐ ${CURRENT_USER.rating}</span>
+                                        <span class="meta-separator">·</span>
+                                        <span class="user-stat">${CURRENT_USER.totalSwaps} swaps</span>
+                                        <span class="meta-separator">·</span>
+                                        <span class="status-dot ${CURRENT_USER.isActive ? '' : 'inactive'}"></span>
+                                        <span>${CURRENT_USER.isActive ? 'Active' : 'Inactive'}</span>
+                                    </div>
+                                </div>
+
+                                <div class="profile-stats-grid">
+                                    <div class="stat-box">
+                                        <div class="stat-value">${CURRENT_USER.totalSwaps}</div>
+                                        <div class="stat-label">Total Swaps</div>
+                                    </div>
+                                    <div class="stat-box">
+                                        <div class="stat-value">${CURRENT_USER.rating}</div>
+                                        <div class="stat-label">Rating</div>
+                                    </div>
+                                    <div class="stat-box">
+                                        <div class="stat-value">100%</div>
+                                        <div class="stat-label">Success Rate</div>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-section">
+                                        <div class="card-title">Account Settings</div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">Edit Profile</span>
+                                            <span class="data-row-value">→</span>
+                                        </div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">Transaction History</span>
+                                            <span class="data-row-value">→</span>
+                                        </div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">Payment Methods</span>
+                                            <span class="data-row-value">→</span>
+                                        </div>
+                                        <div class="data-row">
+                                            <span class="data-row-label">Help & Support</span>
+                                            <span class="data-row-value">→</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        ${templates.bottomNav('profile')}
+                    </div>
+                `;
             }
-            updateButtons();
-        }
+        };
 
-        function updateButtons() {
-            if (currentStep === 1) {
-                const btn = document.getElementById('step1Btn');
-                btn.disabled = !(checks.check1 && checks.check2);
-            } else if (currentStep === 3) {
-                const btn = document.getElementById('step3Btn');
-                btn.disabled = !(checks.check4 && checks.check5);
+        // ==========================================
+        // ACTIONS
+        // ==========================================
+        const actions = {
+            startTrade() {
+                state.resetTrade();
+                state.setScreen('trade');
+            },
+
+            toggleCheck(checkName) {
+                state.tradeChecks[checkName] = !state.tradeChecks[checkName];
+                
+                // Update UI
+                const checkbox = document.getElementById(`check-${checkName}`);
+                if (checkbox) {
+                    checkbox.classList.toggle('checked', state.tradeChecks[checkName]);
+                }
+
+                // Auto-complete other party checks (demo behavior)
+                if (state.tradeChecks.userSent && state.tradeChecks.userConfirmed) {
+                    setTimeout(() => {
+                        state.tradeChecks.otherSent = true;
+                        state.tradeChecks.otherConfirmed = true;
+                        document.getElementById('check-otherSent')?.classList.add('checked');
+                        document.getElementById('check-otherConfirmed')?.classList.add('checked');
+                        this.updateContinueButton();
+                    }, 800);
+                }
+
+                this.updateContinueButton();
+            },
+
+            updateContinueButton() {
+                const btn = document.getElementById('continueBtn');
+                if (!btn) return;
+
+                const allChecked = Object.values(state.tradeChecks).every(v => v);
+                btn.disabled = !allChecked;
+                btn.textContent = allChecked ? 'Continue to Payment' : "I've Sent the Data";
+            },
+
+            continueTrade() {
+                const allChecked = Object.values(state.tradeChecks).every(v => v);
+                if (!allChecked) {
+                    alert('Please complete all checklist items');
+                    return;
+                }
+                
+                // Simulate payment and go to confirmation
+                state.setScreen('confirmation');
+            },
+
+            cancelTrade() {
+                if (confirm('Cancel this swap?')) {
+                    state.resetTrade();
+                    state.setScreen('feed');
+                }
+            },
+
+            submitPost() {
+                alert('Listing posted! (Demo - not saved)');
+                state.setScreen('feed');
             }
-        }
+        };
 
-        function goToStep(step) {
-            currentStep = step;
-            updateTradeView();
-        }
+        // ==========================================
+        // ROUTER
+        // ==========================================
+        const router = {
+            navigate(screenName) {
+                const appEl = document.getElementById('app');
+                if (!appEl) return;
 
-        function updateTradeView() {
-            // Hide all steps
-            for (let i = 1; i <= 4; i++) {
-                const el = document.getElementById(`tradeStep${i}`);
-                if (el) el.style.display = i === currentStep ? 'block' : 'none';
-            }
-            
-            // Update progress
-            const progress = (currentStep - 1) * 33.33;
-            document.getElementById('progressFill').style.width = progress + '%';
-            
-            // Update circles
-            for (let i = 1; i <= 4; i++) {
-                const circle = document.getElementById(`step${i}`);
-                circle.classList.remove('active', 'completed');
-                if (i < currentStep) {
-                    circle.classList.add('completed');
-                } else if (i === currentStep) {
-                    circle.classList.add('active');
+                const screen = screens[screenName];
+                if (!screen) {
+                    console.error(`Screen "${screenName}" not found`);
+                    return;
+                }
+
+                appEl.innerHTML = screen();
+                window.scrollTo(0, 0);
+            },
+
+            back() {
+                // Simple back navigation
+                if (state.currentScreen === 'detail') {
+                    state.setScreen('feed');
+                } else if (state.currentScreen === 'trade') {
+                    state.setScreen('detail');
+                } else if (state.currentScreen === 'post') {
+                    state.setScreen('feed');
+                } else {
+                    state.setScreen('feed');
                 }
             }
-        }
+        };
 
-        function submitPost() {
-            alert('Listing posted! (Demo - not saved)');
-            showScreen('feed');
-        }
+        // ==========================================
+        // INITIALIZATION
+        // ==========================================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initial render
+            router.navigate('feed');
 
-        // Init
-        renderListings();
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    router.back();
+                }
+            });
+
+            // Prevent default form submissions
+            document.addEventListener('submit', (e) => {
+                e.preventDefault();
+            });
+        });
+
+        // Expose to window for onclick handlers
+        window.state = state;
+        window.actions = actions;
+        window.router = router;
     </script>
 </body>
 </html>
